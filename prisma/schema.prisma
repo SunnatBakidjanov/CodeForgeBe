@@ -3,14 +3,15 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
-datasource codeForge {
+datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String  @id
-  email     String  @unique
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(20)
+  email     String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

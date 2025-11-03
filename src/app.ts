@@ -2,6 +2,8 @@ import express from 'express';
 import 'dotenv/config';
 import { Logger } from './utils/Logger';
 import { dbConnect } from './db/dbConnect';
+import { authRoutes } from './routes/authRoutes';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.APP_PORT;
@@ -11,7 +13,17 @@ if (!PORT) {
     process.exit(1);
 }
 
+app.use(
+    cors({
+        origin: ['http://localhost:5173'],
+        credentials: true,
+    })
+);
+
 dbConnect();
+
+app.use(express.json());
+app.use('/api', authRoutes);
 
 app.get('/', (req, res) => {
     res.send('Server is running');
