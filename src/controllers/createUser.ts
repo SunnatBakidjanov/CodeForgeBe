@@ -3,8 +3,14 @@ import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
 
+type RequestBody = {
+    name: string;
+    email: string;
+    password: string;
+};
+
 export const createUser = async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
+    const { name, email, password }: RequestBody = req.body;
 
     if (!name || !email || !password) {
         Logger.warn('Create user: Name or email or password is missing');
