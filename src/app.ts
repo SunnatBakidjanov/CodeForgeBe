@@ -1,15 +1,16 @@
 import express from 'express';
+import cors from 'cors';
 import 'dotenv/config';
 import { Logger } from './utils/Logger';
 import { dbConnect } from './db/dbConnect';
 import { authRoutes } from './routes/authRoutes';
-import cors from 'cors';
+import { sendEmailRoutes } from './routes/sendiEmail';
 
 const app = express();
 const PORT = process.env.APP_PORT;
 
 if (!PORT) {
-    Logger.error('APP_PORT in env is not set');
+    Logger.error('APP_PORT in env is not set', 'app');
     process.exit(1);
 }
 
@@ -24,11 +25,12 @@ dbConnect();
 
 app.use(express.json());
 app.use('/api', authRoutes);
+app.use('/api', sendEmailRoutes);
 
 app.get('/', (req, res) => {
     res.send('Server is running');
 });
 
 app.listen(PORT, () => {
-    Logger.info(`Server is running on port ${PORT}`);
+    Logger.info(`Server is running on port ${PORT}`, 'app');
 });

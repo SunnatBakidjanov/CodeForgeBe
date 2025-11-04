@@ -7,25 +7,28 @@ export class Logger {
         green: '\x1b[32m',
         yellow: '\x1b[33m',
         red: '\x1b[31m',
+        magenta: '\x1b[35m',
     };
 
-    private static format(message: string) {
-        return `${message} \n----------------------------------\n`;
+    private static format(message: string, place?: string) {
+        const isPlace = place ? `${this.colors.magenta}${place}: ${this.colors.reset}` : '';
+
+        return `${isPlace}${message} \n----------------------------------\n`;
     }
 
-    public static info(message: string) {
-        console.log(`\n${this.colors.blue}[INFO]: ${this.date}${this.colors.reset}: ${this.format(message)}`);
+    public static info(message: string, place?: string) {
+        console.log(`\n${this.colors.blue}[INFO]: ${this.date}${this.colors.reset}: ${this.format(message, place)}`);
     }
 
-    public static success(message: string) {
-        console.log(`\n${this.colors.green}[SUCCESS]: ${this.date}${this.colors.reset}: ${this.format(message)}`);
+    public static success(message: string, place?: string) {
+        console.log(`\n${this.colors.green}[SUCCESS]: ${this.date}${this.colors.reset}: ${this.format(message, place)}`);
     }
 
-    public static warn(message: string) {
-        console.warn(`\n${this.colors.yellow}[WARN]: ${this.date}${this.colors.reset}: ${this.format(message)}`);
+    public static warn(message: string, place?: string) {
+        console.warn(`\n${this.colors.yellow}[WARN]: ${this.date}${this.colors.reset}: ${this.format(message, place)}`);
     }
 
-    public static error(message: string) {
-        console.error(`\n${this.colors.red}[ERROR]: ${this.date}${this.colors.reset}: ${this.format(message)}`);
+    public static error(message: string, place?: string) {
+        console.error(`\n${this.colors.red}[ERROR]: ${this.date}${this.colors.reset}: ${this.format(message, place)}`);
     }
 }
