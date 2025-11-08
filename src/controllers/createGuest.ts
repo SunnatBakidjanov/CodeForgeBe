@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
+import { prisma } from '../db/prisma';
 
 export const createGuest = async (req: Request, res: Response) => {
     const guest = req.cookies?.guest;
@@ -17,7 +18,7 @@ export const createGuest = async (req: Request, res: Response) => {
         });
 
         Logger.success(`Guest ${guestId} created`, 'createGuest');
-        return res.status(201).json({ message: 'Guest created successfully' });
+        return res.status(201).json({ message: 'Guest created successfully', guestId: guestId });
     }
 
     Logger.info('Guest already exists', 'createGuest');

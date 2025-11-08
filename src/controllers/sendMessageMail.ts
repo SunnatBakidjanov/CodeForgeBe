@@ -1,14 +1,22 @@
 import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { transporter } from '../utils/transporter';
+import { sendMessageTemplate } from '../templates/sendMessageTemplate';
+import { logoIcon, messageIcon, userIcon, emailIcon } from '../utils/imgPath';
 
 type RequestBody = { [key in 'name' | 'email' | 'message']: string };
 
 export const sendMessageMail = async (req: Request, res: Response) => {
     const { name, email, message }: RequestBody = req.body;
+    const guest = req.cookies?.guest;
+
+    if (!guest) {
+        Logger.warn('Guest not found', 'sendMessageMail');
+        return res.status(401).json({ message: 'Guest not found' });
+    }
 
     if (!name || !email) {
-        Logger.warn('Send message mail: Name or email is missing');
+        Logger.warn('Name or email is missing', 'sendMessageMail');
         return res.status(400).json({ message: 'Name or email is missing' });
     }
 
@@ -17,7 +25,33 @@ export const sendMessageMail = async (req: Request, res: Response) => {
             from: 'CodeForge',
             to: email,
             subject: 'New message from contact form',
-            text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+            html: sendMessageTemplate({ name, email, message }),
+            attachments: [
+                {
+                    filename: 'crossed-hammers-codeforge.png',
+                    path: logoIcon,
+                    cid: 'logo-codeforge',
+                    contentType: 'image/png',
+                },
+                {
+                    filename: 'message-icon-codeforge.png',
+                    path: messageIcon,
+                    cid: 'message-icon-codeforge',
+                    contentType: 'image/png',
+                },
+                {
+                    filename: 'user-icon-codeforge.png',
+                    path: userIcon,
+                    cid: 'user-icon-codeforge',
+                    contentType: 'image/png',
+                },
+                {
+                    filename: 'email-icon-codeforge.png',
+                    path: emailIcon,
+                    cid: 'email-icon-codeforge',
+                    contentType: 'image/png',
+                },
+            ],
         });
 
         Logger.success('Message sent successfully', 'sendMessageMail');
