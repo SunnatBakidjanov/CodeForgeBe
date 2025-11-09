@@ -1,12 +1,18 @@
 export const sendMessageTemplate = ({ name, email, message }: { name: string; email: string; message: string }) => {
     return `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #101828; font-family: Arial;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #101828; font-family: Arial;">
     <tr>
         <td align="center" style="padding-top: 30px;">
-            <a href="https://sunnatbakidjanov.codes/" target="_blank" style="font-size: 28px; padding: 5px; font-weight: bold; color: #ff6900; text-decoration: none;">
-                <span style="color: #fff;">Code</span>Forge
-                <img src="cid:logo-codeforge" alt="Logo" style="width: 45px; vertical-align: middle; margin-left: 2px; margin-bottom: 3px;" />
-            </a>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="min-height: 72px;">
+                <tr>
+                    <td align="center">
+                        <a href="https://sunnatbakidjanov.codes/" target="_blank" style="font-size: 28px; padding: 5px; font-weight: bold; color: #ff6900; text-decoration: none;">
+                            <span style="color: #fff;">Code</span>Forge
+                            <img src="cid:logo-codeforge" alt="Logo" style="width: 45px; height: 68px; vertical-align: middle; margin-left: 2px; margin-bottom: 3px;" />
+                        </a>
+                    </td>
+                </tr>
+            </table>
         </td>
     </tr>
 
@@ -18,10 +24,10 @@ export const sendMessageTemplate = ({ name, email, message }: { name: string; em
                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
                             <tr>
                                 <td align="center">
-                                    <table border="0" cellpadding="0" cellspacing="0" align="center">
+                                    <table border="0" cellpadding="0" cellspacing="0" align="center" style="min-height: 68px;">
                                         <tr>
                                             <td style="vertical-align: middle; padding-right: 8px;">
-                                                <span style="font-size: 24px; font-weight: bold; height: 65px;">
+                                                <span style="font-size: 24px; font-weight: bold;">
                                                 New Message
                                                 </span>
                                             </td>
