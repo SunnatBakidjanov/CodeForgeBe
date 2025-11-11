@@ -7,6 +7,7 @@
         "cors": "^2.8.5",
         "dotenv": "^17.2.3",
         "express": "^5.1.0",
+        "node-cron": "^4.2.1",
         "nodemailer": "^7.0.10",
         "react-redux": "^9.2.0",
         "uuid": "^13.0.0"
@@ -19,7 +20,8 @@
         "prisma:reset": "prisma migrate reset",
         "prisma:generate": "prisma generate",
         "prisma:deploy": "prisma migrate deploy",
-        "prisma:status": "prisma migrate status --schema=./schema.prisma"
+        "prisma:status": "prisma migrate status --schema=./schema.prisma",
+        "cron": "ts-node src/cron-tasks/cron.ts"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.0",

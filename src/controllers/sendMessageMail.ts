@@ -4,7 +4,6 @@ import { Logger } from '../utils/Logger';
 import { transporter } from '../utils/transporter';
 import { sendMessageTemplate } from '../templates/sendMessageTemplate';
 import { logoIcon, messageIcon, userIcon, emailIcon } from '../utils/imgPath';
-import { prisma } from '../db/prisma';
 
 type RequestBody = { [key in 'name' | 'email' | 'message' | 'myEmail']: string };
 
