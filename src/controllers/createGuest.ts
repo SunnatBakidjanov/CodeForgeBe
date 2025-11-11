@@ -17,6 +17,13 @@ export const createGuest = async (req: Request, res: Response) => {
             priority: 'low',
         });
 
+        try {
+            await prisma.guest.create({ data: { id: guestId } });
+        } catch (error) {
+            Logger.error(`Error creating guest: ${(error as Error).message}`, 'createGuest');
+            return res.status(500).json({ message: 'Error creating guest' });
+        }
+
         Logger.success(`Guest ${guestId} created`, 'createGuest');
         return res.status(201).json({ message: 'Guest created successfully', guestId: guestId });
     }

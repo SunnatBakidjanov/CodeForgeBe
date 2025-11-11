@@ -1,19 +1,15 @@
 import { Request, Response } from 'express';
+import 'dotenv/config';
 import { Logger } from '../utils/Logger';
 import { transporter } from '../utils/transporter';
 import { sendMessageTemplate } from '../templates/sendMessageTemplate';
 import { logoIcon, messageIcon, userIcon, emailIcon } from '../utils/imgPath';
+import { prisma } from '../db/prisma';
 
-type RequestBody = { [key in 'name' | 'email' | 'message']: string };
+type RequestBody = { [key in 'name' | 'email' | 'message' | 'myEmail']: string };
 
 export const sendMessageMail = async (req: Request, res: Response) => {
-    const { name, email, message }: RequestBody = req.body;
-    const guest = req.cookies?.guest;
-
-    if (!guest) {
-        Logger.warn('Guest not found', 'sendMessageMail');
-        return res.status(401).json({ message: 'Guest not found' });
-    }
+    const { name, email, message, myEmail }: RequestBody = req.body;
 
     if (!name || !email) {
         Logger.warn('Name or email is missing', 'sendMessageMail');
@@ -23,7 +19,7 @@ export const sendMessageMail = async (req: Request, res: Response) => {
     try {
         await transporter.sendMail({
             from: 'CodeForge',
-            to: email,
+            to: myEmail,
             subject: 'New message from contact form',
             html: sendMessageTemplate({ name, email, message }),
             attachments: [
