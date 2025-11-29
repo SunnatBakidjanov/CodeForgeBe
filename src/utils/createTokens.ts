@@ -1,11 +1,9 @@
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import bcrypt from 'bcrypt';
 import { Logger } from './Logger';
 
 const jwtAccessSecret = process.env.JWT_ACCESS_SECRET as string;
-const hashRounds = process.env.JWT_HASH_ROUND;
 
 export const createAccessToken = (payload: object) => {
     if (!jwtAccessSecret) {
@@ -20,11 +18,10 @@ export const createRefreshToken = () => {
     return crypto.randomBytes(64).toString('hex');
 };
 
-export const hashToken = async (token: string) => {
-    if (!hashRounds) {
-        Logger.error('JWT_HASH_ROUND in env is not set', 'hashToken');
-        throw new Error('JWT_HASH_ROUND in env is not set');
-    }
+export const hashRefreshToken = (token: string) => {
+    return crypto.createHash('sha256').update(token).digest('hex');
+};
 
-    return bcrypt.hash(token, Number(hashRounds));
+export const verifyAccessToken = (token: string) => {
+    return jwt.verify(token, jwtAccessSecret);
 };

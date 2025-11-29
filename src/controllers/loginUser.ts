@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
-import { createAccessToken, createRefreshToken, hashToken } from '../utils/createTokens';
+import { createAccessToken, createRefreshToken, hashRefreshToken } from '../utils/createTokens';
 
 type RequestBody = { [key in 'email' | 'password']: string };
 
@@ -39,7 +39,7 @@ export const loginUser = async (req: Request, res: Response) => {
         const accessToken = createAccessToken({ id: user.id, email: user.email });
 
         const refreshToken = createRefreshToken();
-        const refreshHash = await hashToken(refreshToken);
+        const refreshHash = hashRefreshToken(refreshToken);
 
         await prisma.sessions.create({
             data: {
@@ -47,7 +47,7 @@ export const loginUser = async (req: Request, res: Response) => {
                 refreshHash,
                 userAgent: req.get('user-agent'),
                 ip: req.ip,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 дней
+                expiresAt: new Date(Date.now() + Number(refreshExpIn)), // 30 дней
             },
         });
 
