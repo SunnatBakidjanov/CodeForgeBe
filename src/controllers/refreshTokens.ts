@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../db/prisma';
 import { Logger } from '../utils/Logger';
-import { createAccessToken, createRefreshToken, hashRefreshToken } from '../utils/createTokens';
+import { createAccessToken, createRefreshToken, hashRefreshToken } from '../service/createTokens';
 import type { AuthenticatedRequest } from '../types/request';
 
 export const refreshTokens = async (req: AuthenticatedRequest, res: Response) => {

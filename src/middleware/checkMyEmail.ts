@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
 import 'dotenv/config';
+import { Response, NextFunction } from 'express';
+import { AuthenticatedRequest } from '../types/request';
 import { Logger } from '../utils/Logger';
 
-export const checkMyEmail = (req: Request, res: Response, next: NextFunction) => {
+export const checkMyEmail = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const myEmail = process.env.EMAIL_USER;
 
     if (!myEmail) {
@@ -10,7 +11,7 @@ export const checkMyEmail = (req: Request, res: Response, next: NextFunction) =>
         return res.status(500).json({ message: 'Error sending email' });
     }
 
-    req.body.myEmail = myEmail;
+    req.myEmail = myEmail;
 
     next();
 };

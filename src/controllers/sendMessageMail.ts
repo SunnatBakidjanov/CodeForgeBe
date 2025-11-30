@@ -1,14 +1,15 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import 'dotenv/config';
 import { Logger } from '../utils/Logger';
-import { transporter } from '../utils/transporter';
+import { transporter } from '../service/transporter';
 import { sendMessageTemplate } from '../templates/sendMessageTemplate';
 import { logoIcon, messageIcon, userIcon, emailIcon } from '../utils/imgPath';
+import { AuthenticatedRequest } from '../types/request';
 
 type RequestBody = { [key in 'name' | 'email' | 'message' | 'myEmail']: string };
 
-export const sendMessageMail = async (req: Request, res: Response) => {
-    const { name, email, message, myEmail }: RequestBody = req.body;
+export const sendMessageMail = async (req: AuthenticatedRequest, res: Response) => {
+    const { name, email, message }: RequestBody = req.body;
 
     if (!name || !email) {
         Logger.warn('Name or email is missing', 'sendMessageMail');
@@ -18,7 +19,7 @@ export const sendMessageMail = async (req: Request, res: Response) => {
     try {
         await transporter.sendMail({
             from: 'CodeForge',
-            to: myEmail,
+            to: req.myEmail,
             subject: 'New message from contact form',
             html: sendMessageTemplate({ name, email, message }),
             attachments: [

@@ -3,7 +3,8 @@ import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
-import { createAccessToken, createRefreshToken, hashRefreshToken } from '../utils/createTokens';
+import { createAccessToken, createRefreshToken, hashRefreshToken } from '../service/createTokens';
+import { createRefreshCookie } from '../service/createRefreshCookie';
 
 type RequestBody = { [key in 'email' | 'password']: string };
 
@@ -29,7 +30,7 @@ export const loginUser = async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Email or password is missing' });
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(password, user.password as string);
 
         if (!passwordMatch) {
             Logger.warn(`${email} incorrect password`, 'loginUser');
@@ -38,8 +39,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
         const accessToken = createAccessToken({ id: user.id, email: user.email });
 
-        const refreshToken = createRefreshToken();
-        const refreshHash = hashRefreshToken(refreshToken);
+        const URT = createRefreshToken();
+        const refreshHash = hashRefreshToken(URT);
 
         await prisma.sessions.create({
             data: {
@@ -51,13 +52,7 @@ export const loginUser = async (req: Request, res: Response) => {
             },
         });
 
-        res.cookie('URT', refreshToken, {
-            httpOnly: true,
-            secure: false, // ЗАГЛУШКА в продакшене изменить на true для HTTPS
-            sameSite: 'lax',
-            maxAge: Number(refreshExpIn),
-            priority: 'low',
-        });
+        createRefreshCookie(res, URT, refreshExpIn);
 
         Logger.success(`${email} logged in successfully`, 'loginUser');
         return res.status(200).json({ message: 'User logged in successfully', token: accessToken });

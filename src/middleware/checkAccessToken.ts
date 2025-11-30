@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { Logger } from '../utils/Logger';
-import { verifyAccessToken } from '../utils/createTokens';
+import { verifyAccessToken } from '../service/createTokens';
 import type { AuthenticatedRequest, AccessToken } from '../types/request';
 
 export const checkAccessToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -14,7 +14,7 @@ export const checkAccessToken = (req: AuthenticatedRequest, res: Response, next:
     try {
         const decodedToken = verifyAccessToken(token);
 
-        req.user = decodedToken as AccessToken;
+        req.body.accessToken = decodedToken as AccessToken;
         next();
     } catch (err) {
         Logger.error(`Server Error\n ${(err as Error).message}`, 'checkAccessToken');

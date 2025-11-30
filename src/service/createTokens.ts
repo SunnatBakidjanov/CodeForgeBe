@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { Logger } from './Logger';
+import { Logger } from '../utils/Logger';
 
 const jwtAccessSecret = process.env.JWT_ACCESS_SECRET as string;
 
