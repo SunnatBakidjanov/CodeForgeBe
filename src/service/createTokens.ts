@@ -3,15 +3,21 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { Logger } from '../utils/Logger';
 
-const jwtAccessSecret = process.env.JWT_ACCESS_SECRET as string;
+const jwtAccessSecret = process.env.JWT_ACCESS_SECRET;
+const accessExpIn = process.env.JWT_ACCESS_EXP_IN;
+
+if (!jwtAccessSecret) {
+    Logger.error('JWT_ACCESS_SECRET in env is not set', 'createAccessToken');
+    throw new Error('JWT_ACCESS_SECRET in env is not set');
+}
+
+if (!accessExpIn) {
+    Logger.error('JWT_ACCESS_EXP_IN in env is not set', 'createAccessToken');
+    throw new Error('JWT_ACCESS_EXP_IN in env is not set');
+}
 
 export const createAccessToken = (payload: object) => {
-    if (!jwtAccessSecret) {
-        Logger.error('JWT_ACCESS_SECRET in env is not set', 'createAccessToken');
-        throw new Error('JWT_ACCESS_SECRET in env is not set');
-    }
-
-    return jwt.sign(payload, `${jwtAccessSecret}`, { expiresIn: '15m' });
+    return jwt.sign(payload, `${jwtAccessSecret}`, { expiresIn: Number(accessExpIn) });
 };
 
 export const createRefreshToken = () => {

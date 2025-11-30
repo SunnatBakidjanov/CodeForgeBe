@@ -1,11 +1,12 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
+import { AuthenticatedRequest } from '../types/request';
 
 type RequestBody = { [key in 'name' | 'email' | 'password']: string };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: AuthenticatedRequest, res: Response) => {
     const { name, email, password }: RequestBody = req.body;
 
     if (!name || !email || !password) {
@@ -21,7 +22,7 @@ export const createUser = async (req: Request, res: Response) => {
     }
 
     try {
-        const HASH_ROUNDS = 10;
+        const HASH_ROUNDS = req.user?.userHashRounds as number;
         const hashedPassword = await bcrypt.hash(password, HASH_ROUNDS);
 
         await prisma.user.create({

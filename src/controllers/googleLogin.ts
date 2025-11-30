@@ -1,10 +1,11 @@
 import 'dotenv/config';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { Logger } from '../utils/Logger';
 import axios from 'axios';
 import { prisma } from '../db/prisma';
 import { createAccessToken } from '../service/createTokens';
 import { refreshCreateSession } from '../service/refreshCreateSession';
+import { AuthenticatedRequest } from '../types/request';
 
 type ReqBody = {
     googleAccessToken: string;
@@ -19,14 +20,9 @@ type GoogleUser = {
     picture?: string;
 };
 
-export const googleLogin = async (req: Request, res: Response) => {
+export const googleLogin = async (req: AuthenticatedRequest, res: Response) => {
     const { googleAccessToken }: ReqBody = req.body;
-    const refreshExpIn = process.env.JWT_REFRESH_EXP_IN;
-
-    if (!refreshExpIn) {
-        Logger.error('JWT_REFRESH_EXP_IN in env is not set', 'loginUser');
-        return res.status(500).json({ message: 'Error logging in' });
-    }
+    const refreshExpIn = req.user?.refreshExpIn as string;
 
     if (!googleAccessToken) {
         Logger.warn('Google access token is missing', 'googleLogin');
@@ -58,9 +54,9 @@ export const googleLogin = async (req: Request, res: Response) => {
 
         refreshCreateSession(req, res, user.id, refreshExpIn);
 
-        const accessToken = createAccessToken({ id: user.id, email: user.email });
-
         Logger.success('Successfully logged in', 'googleLogin');
+
+        const accessToken = createAccessToken({ id: user.id, email: user.email });
         return res.status(200).json({ message: 'Successfully logged in', accessToken });
     } catch (error) {
         Logger.error(`Error logging in: ${(error as Error).message}`, 'googleLogin');

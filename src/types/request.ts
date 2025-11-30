@@ -9,13 +9,16 @@ export type UserType = {
     updatedAt: Date;
 };
 
-export interface AuthenticatedRequest extends Request {
-    user?: UserType;
-    refreshExpIn?: string;
-    myEmail?: string;
-}
-
 export type AccessToken = {
     id: number;
     email: string;
 };
+
+export interface AuthenticatedRequest extends Request {
+    user?: UserType & {
+        accessToken?: AccessToken;
+        refreshExpIn?: string;
+        userHashRounds?: number;
+    };
+    myEmail?: string;
+}

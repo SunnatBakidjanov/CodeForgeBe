@@ -5,10 +5,11 @@ import { refreshTokens } from '../controllers/refreshTokens';
 import { checkAccessToken } from '../middleware/checkAccessToken';
 import { googleLogin } from '../controllers/googleLogin';
 import { checkRefreshExpIn } from '../middleware/checkRefreshExpIn';
+import { checkHasRounds } from '../middleware/checkHashRounds';
 
 export const authRoutes = Router();
 
-authRoutes.post('/register', createUser);
-authRoutes.get('/refresh', checkAccessToken, refreshTokens);
-authRoutes.post('/login', loginUser);
+authRoutes.post('/register', checkHasRounds, createUser);
+authRoutes.get('/refresh', checkRefreshExpIn, checkAccessToken, refreshTokens);
+authRoutes.post('/login', checkRefreshExpIn, loginUser);
 authRoutes.post('/google-login', checkRefreshExpIn, googleLogin);

@@ -14,10 +14,12 @@ export const checkAccessToken = (req: AuthenticatedRequest, res: Response, next:
     try {
         const decodedToken = verifyAccessToken(token);
 
-        req.body.accessToken = decodedToken as AccessToken;
+        Logger.info('Access token verified', 'checkAccessToken');
+
+        if (req.user) {
+            req.user.accessToken = decodedToken as AccessToken;
+        }
+
         next();
-    } catch (err) {
-        Logger.error(`Server Error\n ${(err as Error).message}`, 'checkAccessToken');
-        return res.status(500).json({ message: 'Server error' });
-    }
+    } catch (err) {}
 };

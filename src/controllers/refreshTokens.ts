@@ -1,19 +1,15 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { prisma } from '../db/prisma';
 import { Logger } from '../utils/Logger';
 import { createAccessToken, createRefreshToken, hashRefreshToken } from '../service/createTokens';
 import type { AuthenticatedRequest } from '../types/request';
+import { createRefreshCookie } from '../service/createRefreshCookie';
 
 export const refreshTokens = async (req: AuthenticatedRequest, res: Response) => {
-    const refreshExpIn = process.env.JWT_REFRESH_EXP_IN;
-
-    if (!refreshExpIn) {
-        Logger.error('JWT_REFRESH_EXP_IN in env is not set', 'refreshTokens');
-        return res.status(500).json({ message: 'Error refreshing tokens' });
-    }
+    const refreshExpIn = req.user?.refreshExpIn as string;
 
     try {
-        const refreshToken = req.cookies.refreshToken;
+        const refreshToken = req.cookies.URT;
 
         if (!refreshToken) {
             Logger.info('No refresh token', 'refreshTokens');
@@ -50,12 +46,7 @@ export const refreshTokens = async (req: AuthenticatedRequest, res: Response) =>
             },
         });
 
-        res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: false, // ЗАГЛУШКА в продакшене изменить на true для HTTPS
-            sameSite: 'lax',
-            maxAge: Number(refreshExpIn),
-        });
+        createRefreshCookie(res, newRefreshToken, refreshExpIn);
 
         return res.json({ accessToken: newAccessToken });
     } catch (err) {

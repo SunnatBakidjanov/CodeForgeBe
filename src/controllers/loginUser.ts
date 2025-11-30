@@ -1,21 +1,18 @@
 import 'dotenv/config';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
 import { createAccessToken, createRefreshToken, hashRefreshToken } from '../service/createTokens';
 import { createRefreshCookie } from '../service/createRefreshCookie';
+import { refreshCreateSession } from '../service/refreshCreateSession';
+import { AuthenticatedRequest } from '../types/request';
 
 type RequestBody = { [key in 'email' | 'password']: string };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: AuthenticatedRequest, res: Response) => {
     const { email, password }: RequestBody = req?.body;
-    const refreshExpIn = process.env.JWT_REFRESH_EXP_IN;
-
-    if (!refreshExpIn) {
-        Logger.error('JWT_REFRESH_EXP_IN in env is not set', 'loginUser');
-        return res.status(500).json({ message: 'Error logging in' });
-    }
+    const refreshExpIn = req.user?.refreshExpIn as string;
 
     if (!email || !password) {
         Logger.warn('Email or password is missing', 'loginUser');
@@ -37,24 +34,11 @@ export const loginUser = async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Email or password is missing' });
         }
 
-        const accessToken = createAccessToken({ id: user.id, email: user.email });
-
-        const URT = createRefreshToken();
-        const refreshHash = hashRefreshToken(URT);
-
-        await prisma.sessions.create({
-            data: {
-                user: { connect: { id: user.id } },
-                refreshHash,
-                userAgent: req.get('user-agent'),
-                ip: req.ip,
-                expiresAt: new Date(Date.now() + Number(refreshExpIn)), // 30 дней
-            },
-        });
-
-        createRefreshCookie(res, URT, refreshExpIn);
+        refreshCreateSession(req, res, user.id, refreshExpIn);
 
         Logger.success(`${email} logged in successfully`, 'loginUser');
+
+        const accessToken = createAccessToken({ id: user.id, email: user.email });
         return res.status(200).json({ message: 'User logged in successfully', token: accessToken });
     } catch (error) {
         Logger.error(`Server Error\n ${(error as Error).message}`, 'loginUser');
