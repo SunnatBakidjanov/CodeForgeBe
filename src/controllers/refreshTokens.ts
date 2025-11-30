@@ -13,7 +13,7 @@ export const refreshTokens = async (req: AuthenticatedRequest, res: Response) =>
 
         if (!refreshToken) {
             Logger.info('No refresh token', 'refreshTokens');
-            return res.status(401).json({ message: 'No refresh token' });
+            return res.status(403).json({ message: 'No refresh token' });
         }
 
         const refreshHash = hashRefreshToken(refreshToken);
@@ -25,12 +25,12 @@ export const refreshTokens = async (req: AuthenticatedRequest, res: Response) =>
 
         if (!session) {
             Logger.info('No session found', 'refreshTokens');
-            return res.status(401).json({ message: 'No session found' });
+            return res.status(403).json({ message: 'No session found' });
         }
 
         if (session.expiresAt < new Date()) {
             Logger.info('Session expired', 'refreshTokens');
-            return res.status(401).json({ message: 'Session expired' });
+            return res.status(403).json({ message: 'Session expired' });
         }
 
         const newAccessToken = createAccessToken({ id: session.user.id, email: session.user.email });

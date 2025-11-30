@@ -10,7 +10,7 @@ export const checkGuest = async (req: Request, res: Response, next: NextFunction
 
     if (!guest) {
         Logger.warn('Guest not found', 'checkGuest');
-        return res.status(401).json({ message: 'Guest not found' });
+        return res.status(403).json({ message: 'Guest not found' });
     }
 
     try {
@@ -18,7 +18,7 @@ export const checkGuest = async (req: Request, res: Response, next: NextFunction
 
         if (!foundGuest) {
             Logger.warn('Guest not found in DB', 'checkGuest');
-            return res.status(401).json({ message: 'Guest not found in database' });
+            return res.status(403).json({ message: 'Guest not found in database' });
         }
 
         Logger.info(`Guest found: ${guest}`, 'checkGuest');
