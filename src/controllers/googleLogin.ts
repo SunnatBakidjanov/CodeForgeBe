@@ -52,7 +52,7 @@ export const googleLogin = async (req: AuthenticatedRequest, res: Response) => {
             });
         }
 
-        refreshCreateSession(req, res, user.id, refreshExpIn);
+        await refreshCreateSession(req, res, user.id, refreshExpIn);
 
         Logger.success('Successfully logged in', 'googleLogin');
 

@@ -13,14 +13,19 @@ export const refreshCreateSession: FnType = async (req, res, userId, refreshExpI
     const session = await prisma.sessions.findFirst({ where: { refreshHash: refreshCookieHash } });
 
     if (session) {
+        const URT = createRefreshToken();
+        const refreshHash = hashRefreshToken(URT);
+
         await prisma.sessions.update({
             where: { id: session.id },
             data: {
+                user: { connect: { id: userId } },
+                refreshHash,
                 expiresAt: new Date(Date.now() + Number(refreshExpIn)),
             },
         });
 
-        createRefreshCookie(res, refreshCookie, refreshExpIn);
+        createRefreshCookie(res, refreshHash, refreshExpIn);
 
         Logger.info('Session found and updated', 'refreshCreateSession');
     } else {

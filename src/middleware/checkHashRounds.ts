@@ -10,9 +10,9 @@ export const checkHasRounds = (req: AuthenticatedRequest, res: Response, next: N
         return res.status(500).json({ message: 'Error logging in' });
     }
 
-    if (req.user) {
-        req.user.userHashRounds = Number(hashRounds);
-    }
+    req.user = {
+        userHashRounds: Number(hashRounds),
+    } as AuthenticatedRequest['user'];
 
     return next();
 };

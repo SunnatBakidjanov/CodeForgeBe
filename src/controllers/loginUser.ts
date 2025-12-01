@@ -34,7 +34,7 @@ export const loginUser = async (req: AuthenticatedRequest, res: Response) => {
             return res.status(401).json({ message: 'Email or password is missing' });
         }
 
-        refreshCreateSession(req, res, user.id, refreshExpIn);
+        await refreshCreateSession(req, res, user.id, refreshExpIn);
 
         Logger.success(`${email} logged in successfully`, 'loginUser');
 

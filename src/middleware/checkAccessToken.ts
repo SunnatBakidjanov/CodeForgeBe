@@ -15,9 +15,9 @@ export const checkAccessToken = (req: AuthenticatedRequest, res: Response, next:
     try {
         const decodedToken = verifyAccessToken(token);
 
-        if (req.user) {
-            req.user.accessToken = decodedToken as AccessToken;
-        }
+        req.user = {
+            accessToken: decodedToken as AccessToken,
+        } as AuthenticatedRequest['user'];
 
         Logger.info('Access token verified', 'checkAccessToken');
 
