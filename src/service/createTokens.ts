@@ -25,6 +25,10 @@ export const createRefreshToken = () => {
 };
 
 export const hashRefreshToken = (token: string) => {
+    if (!token) {
+        Logger.info('No refresh token', 'hashRefreshToken');
+        throw new Error('No refresh token');
+    }
     return crypto.createHash('sha256').update(token).digest('hex');
 };
 

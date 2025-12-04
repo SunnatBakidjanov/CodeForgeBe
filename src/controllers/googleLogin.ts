@@ -4,7 +4,7 @@ import { Logger } from '../utils/Logger';
 import axios from 'axios';
 import { prisma } from '../db/prisma';
 import { createAccessToken } from '../service/createTokens';
-import { refreshCreateSession } from '../service/refreshCreateSession';
+import { createSession } from '../service/createSession';
 import { AuthenticatedRequest } from '../types/request';
 
 type ReqBody = {
@@ -30,7 +30,7 @@ export const googleLogin = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     try {
-        const resGoogle = await axios.get<GoogleUser>('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${googleAccessToken}` } });
+        const resGoogle = await axios.get<GoogleUser>('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${googleAccessToken}`, 'Content-Type': 'application/json' } });
         const googleData = resGoogle.data;
 
         if (!googleData || !googleData.name || !googleData.email) {
@@ -38,9 +38,17 @@ export const googleLogin = async (req: AuthenticatedRequest, res: Response) => {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        let user = await prisma.user.findUnique({ where: { googleId: googleData.sub } });
+        let user = await prisma.user.findUnique({ where: { email: googleData.email } });
 
-        if (!user) {
+        if (user) {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    provider: 'google',
+                    googleId: user.googleId || googleData.sub,
+                },
+            });
+        } else {
             user = await prisma.user.create({
                 data: {
                     name: googleData.name,
@@ -52,7 +60,7 @@ export const googleLogin = async (req: AuthenticatedRequest, res: Response) => {
             });
         }
 
-        await refreshCreateSession(req, res, user.id, refreshExpIn);
+        await createSession(req, res, user.id, refreshExpIn);
 
         Logger.success('Successfully logged in', 'googleLogin');
 

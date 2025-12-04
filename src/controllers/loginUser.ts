@@ -3,9 +3,8 @@ import { Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
-import { createAccessToken, createRefreshToken, hashRefreshToken } from '../service/createTokens';
-import { createRefreshCookie } from '../service/createRefreshCookie';
-import { refreshCreateSession } from '../service/refreshCreateSession';
+import { createAccessToken } from '../service/createTokens';
+import { createSession } from '../service/createSession';
 import { AuthenticatedRequest } from '../types/request';
 
 type RequestBody = { [key in 'email' | 'password']: string };
@@ -34,7 +33,7 @@ export const loginUser = async (req: AuthenticatedRequest, res: Response) => {
             return res.status(401).json({ message: 'Email or password is missing' });
         }
 
-        await refreshCreateSession(req, res, user.id, refreshExpIn);
+        await createSession(req, res, user.id, refreshExpIn);
 
         Logger.success(`${email} logged in successfully`, 'loginUser');
 

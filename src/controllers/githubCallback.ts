@@ -1,28 +1,22 @@
 import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
 import axios from 'axios';
+import { sendGithubHtml } from '../service/sendGithubHtmls';
 
 export const githubCallback = async (req: Request, res: Response) => {
     const code = req.query.code as string;
 
     if (!code) {
         Logger.error('No code returned from GitHub', 'githubCallback');
-        return res.status(400).json({ message: 'Invalid request' });
+        return sendGithubHtml(res, 'error', 400, 'No code returned from GitHub');
     }
 
     try {
-        // 1. Получаем access_token
-        const tokenResponse = await axios.post(
-            'https://github.com/login/oauth/access_token',
-            {
-                client_id: process.env.GITHUB_CLIENT_ID,
-                client_secret: process.env.GITHUB_SECRET,
-                code,
-            },
-            {
-                headers: { Accept: 'application/json' },
-            }
-        );
+        const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+            client_id: process.env.GITHUB_CLIENT_ID,
+            client_secret: process.env.GITHUB_SECRET,
+            code,
+        });
 
         const access_token = tokenResponse.data.access_token;
 
@@ -33,7 +27,6 @@ export const githubCallback = async (req: Request, res: Response) => {
 
         Logger.info(`Github access token: ${access_token}`, 'githubCallback');
 
-        // 2. Получаем данные профиля
         const userResponse = await axios.get('https://api.github.com/user', {
             headers: {
                 Authorization: `Bearer ${access_token}`,
