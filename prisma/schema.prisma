@@ -21,6 +21,7 @@ model User {
   provider  AuthProvider @default(local)
   googleId  String?      @unique
   githubId  String?      @unique
+  isLocalAuth Boolean     @default(false)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
   sessions  Sessions[]

@@ -33,6 +33,13 @@ export const loginUser = async (req: AuthenticatedRequest, res: Response) => {
             return res.status(401).json({ message: 'Email or password is missing' });
         }
 
+        try {
+            await prisma.user.update({ where: { email }, data: { provider: 'local' } });
+        } catch (error) {
+            Logger.error(`Error updating user provider: ${(error as Error).message}`, 'loginUser');
+            return res.status(500).json({ message: 'Error logging in' });
+        }
+
         await createSession(req, res, user.id, refreshExpIn);
 
         Logger.success(`${email} logged in successfully`, 'loginUser');

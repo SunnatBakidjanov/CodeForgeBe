@@ -1,8 +1,8 @@
 import { Response } from 'express';
 
-type FnTypes = (res: Response, type: 'error' | 'success', status?: number, message?: string) => Response;
+type FnTypes = (res: Response, type: 'error' | 'success', status?: number, message?: string, accessToken?: string) => Response;
 
-export const sendGithubHtml: FnTypes = (res, type, status, message) => {
+export const sendGithubHtml: FnTypes = (res, type, status, message, accessToken) => {
     return res.send(`
         <html>
             <body>
@@ -11,7 +11,8 @@ export const sendGithubHtml: FnTypes = (res, type, status, message) => {
                         {
                             type: "${type}",
                             status: "${status}",
-                            message: "${message}"
+                            message: "${message}",
+                            accessToken: "${accessToken}"
                         },
                         "*"
                     );
