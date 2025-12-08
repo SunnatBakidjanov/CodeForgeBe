@@ -84,7 +84,7 @@ export const githubCallback = async (req: AuthenticatedRequest, res: Response) =
 
         Logger.success('Logged in with GitHub', 'githubCallback');
 
-        const accessToken = createAccessToken({ id: user.id, email: user.email });
+        const accessToken = createAccessToken({ id: user.id, email: user.email, name: user.name });
         return sendGithubHtml(res, 'success', 200, undefined, accessToken);
     } catch (error) {
         Logger.error(`Server error:\n ${(error as Error).message}`, 'githubCallback');

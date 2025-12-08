@@ -3,11 +3,12 @@ import { hashRefreshToken, createRefreshToken } from './createTokens';
 import { createRefreshCookie } from './createRefreshCookie';
 import { prisma } from '../db/prisma';
 import { Logger } from '../utils/Logger';
+import { readCookie } from '../utils/readCookie';
 
 type FnType = (req: Request, res: Response, userId: string, refreshExpIn: string) => Promise<void>;
 
 export const createSession: FnType = async (req, res, userId, refreshExpIn) => {
-    const refreshCookie = req.cookies.URT;
+    const refreshCookie = readCookie(req, 'REFRESH');
 
     if (refreshCookie) {
         const hash = hashRefreshToken(refreshCookie);

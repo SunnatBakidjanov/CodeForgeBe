@@ -9,6 +9,7 @@ export const sendGithubHtml: FnTypes = (res, type, status, message, accessToken)
                 <script>
                     window.opener?.postMessage(
                         {
+                            source: "github-auth",
                             type: "${type}",
                             status: "${status}",
                             message: "${message}",

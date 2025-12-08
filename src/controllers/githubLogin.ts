@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
-import axios from 'axios';
 
 export const githubLogin = async (req: Request, res: Response) => {
     const clientID = process.env.GITHUB_CLIENT_ID;

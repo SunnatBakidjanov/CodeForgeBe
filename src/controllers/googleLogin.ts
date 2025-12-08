@@ -64,8 +64,8 @@ export const googleLogin = async (req: AuthenticatedRequest, res: Response) => {
 
         Logger.success('Successfully logged in', 'googleLogin');
 
-        const accessToken = createAccessToken({ id: user.id, email: user.email });
-        return res.status(200).json({ message: 'Successfully logged in', accessToken });
+        const accessToken = createAccessToken({ id: user.id, email: user.email, name: user.name });
+        return res.status(200).json({ message: 'Successfully logged in', token: accessToken });
     } catch (error) {
         Logger.error(`Error logging in: ${(error as Error).message}`, 'googleLogin');
         return res.status(500).json({ message: 'Error logging in' });

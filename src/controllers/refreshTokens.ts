@@ -4,12 +4,13 @@ import { Logger } from '../utils/Logger';
 import { createAccessToken, createRefreshToken, hashRefreshToken } from '../service/createTokens';
 import type { AuthenticatedRequest } from '../types/request';
 import { createRefreshCookie } from '../service/createRefreshCookie';
+import { readCookie } from '../utils/readCookie';
 
 export const refreshTokens = async (req: AuthenticatedRequest, res: Response) => {
     const refreshExpIn = req.user?.refreshExpIn as string;
 
     try {
-        const refreshToken = req.cookies.URT;
+        const refreshToken = readCookie(req, 'REFRESH');
 
         if (!refreshToken) {
             Logger.info('No refresh token', 'refreshTokens');
@@ -33,7 +34,7 @@ export const refreshTokens = async (req: AuthenticatedRequest, res: Response) =>
             return res.status(403).json({ message: 'Session expired' });
         }
 
-        const newAccessToken = createAccessToken({ id: session.user.id, email: session.user.email });
+        const newAccessToken = createAccessToken({ id: session.user.id, email: session.user.email, name: session.user.name });
 
         const newRefreshToken = createRefreshToken();
         const newRefreshHash = hashRefreshToken(newRefreshToken);

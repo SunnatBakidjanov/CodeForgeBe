@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
+import { readCookie } from '../utils/readCookie';
 
 export const checkGuest = async (req: Request, res: Response, next: NextFunction) => {
-    const guest = req.cookies?.guest;
+    const guest = readCookie(req, 'GUEST');
     const { user } = req.body;
 
     if (user) return next();
