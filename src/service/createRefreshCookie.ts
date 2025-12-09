@@ -9,3 +9,12 @@ export const createRefreshCookie = (res: Response, refreshToken: string, refresh
         maxAge: Number(refreshExpIn),
     });
 };
+
+export const clearRefreshCookie = (res: Response) => {
+    return res.clearCookie('URT', {
+        httpOnly: true,
+        secure: false, // ЗАГЛУШКА в продакшене изменить на true для HTTPS
+        sameSite: 'lax',
+        path: '/',
+    });
+};
