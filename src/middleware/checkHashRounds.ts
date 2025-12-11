@@ -1,3 +1,4 @@
+'dotenv/config';
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types/request';
 import { Logger } from '../utils/Logger';

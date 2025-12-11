@@ -33,6 +33,14 @@ model Guest {
     updatedAt DateTime @updatedAt
 }
 
+model VerificationCode {
+    id        String   @id @unique @default(uuid())
+    email     String   @unique
+    code      String
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+}
+
 model Sessions {
     id          String   @id @default(uuid())
     userId      String

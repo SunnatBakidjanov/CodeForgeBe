@@ -4,12 +4,12 @@ import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
 import { AuthenticatedRequest } from '../types/request';
 
-type RequestBody = { [key in 'name' | 'email' | 'password']: string };
+type RequestBody = { [key in 'name' | 'email' | 'password' | 'code']: string };
 
 export const createUser = async (req: AuthenticatedRequest, res: Response) => {
-    const { name, email, password }: RequestBody = req.body;
+    const { name, email, password, code }: RequestBody = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !code) {
         Logger.warn('Name or email or password is missing', 'createUser');
         return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -22,6 +22,21 @@ export const createUser = async (req: AuthenticatedRequest, res: Response) => {
     }
 
     try {
+        const verifyEntry = await prisma.verificationCode.findUnique({ where: { email } });
+
+        if (!verifyEntry || verifyEntry.code !== code) {
+            Logger.warn(`Verification code not found`, 'createUser');
+            return res.status(400).json({ message: 'Invalid code' });
+        }
+
+        if (verifyEntry.expiresAt < new Date()) {
+            await prisma.verificationCode.deleteMany({ where: { email } });
+            Logger.warn('Verification code expired', 'createUser');
+            return res.status(410).json({ message: 'Verification code expired' });
+        }
+
+        await prisma.verificationCode.deleteMany({ where: { email } });
+
         const HASH_ROUNDS = req.user?.userHashRounds as number;
         const hashedPassword = await bcrypt.hash(password, HASH_ROUNDS);
 

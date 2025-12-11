@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import nodemailer, { Transporter } from 'nodemailer';
+import nodemailer from 'nodemailer';
 import { Logger } from '../utils/Logger';
 
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
