@@ -12,8 +12,23 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
 
     const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const cooldownMs = 60 * 1000;
 
     try {
+        const lastEntry = await prisma.verificationCode.findFirst({
+            where: { email },
+        });
+
+        if (lastEntry) {
+            const now = Date.now();
+            const lastSent = lastEntry.lastSentAt.getTime();
+
+            if (now - lastSent < cooldownMs) {
+                const waitSec = Math.ceil((cooldownMs - (now - lastSent)) / 1000);
+                return res.status(429).json({ message: `Please wait ${waitSec} seconds before requesting a new code.`, waitSec });
+            }
+        }
+
         await prisma.verificationCode.deleteMany({ where: { email } });
         await prisma.verificationCode.create({ data: { email, code, expiresAt } });
 

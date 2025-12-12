@@ -34,11 +34,12 @@ model Guest {
 }
 
 model VerificationCode {
-    id        String   @id @unique @default(uuid())
-    email     String   @unique
-    code      String
-    expiresAt DateTime
-    createdAt DateTime @default(now())
+    id         String   @id @unique @default(uuid())
+    email      String   @unique
+    code       String
+    expiresAt  DateTime
+    lastSentAt DateTime @default(now())
+    createdAt  DateTime @default(now())
 }
 
 model Sessions {
