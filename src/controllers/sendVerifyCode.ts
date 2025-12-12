@@ -15,6 +15,13 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
     const cooldownMs = 60 * 1000;
 
     try {
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        if (user?.isLocalAuth) {
+            Logger.info(`User with email ${email} already exists`, 'sendVerifyCode');
+            return res.status(409).json({ message: 'User already exists' });
+        }
+
         const lastEntry = await prisma.verificationCode.findFirst({
             where: { email },
         });
