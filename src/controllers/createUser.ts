@@ -26,7 +26,7 @@ export const createUser = async (req: AuthenticatedRequest, res: Response) => {
 
         if (!verifyEntry || verifyEntry.code !== code) {
             Logger.warn(`Verification code not found`, 'createUser');
-            return res.status(400).json({ message: 'Invalid code' });
+            return res.status(400).json({ message: 'Invalid code', type: 'codeNotFound' });
         }
 
         if (verifyEntry.expiresAt < new Date()) {

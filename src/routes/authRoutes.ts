@@ -11,6 +11,7 @@ import { githubCallback } from '../controllers/githubCallback';
 import { logout } from '../controllers/logout';
 import { sendVerifyCode } from '../controllers/sendVerifyCode';
 import { checkMyEmail } from '../middleware/checkMyEmail';
+import { sendEmailRecoverPass } from '../controllers/recoverPass';
 
 export const authRoutes = Router();
 
@@ -22,3 +23,4 @@ authRoutes.get('/github-login', githubLogin);
 authRoutes.get('/github-callback', checkRefreshExpIn, githubCallback);
 authRoutes.get('/logout', logout);
 authRoutes.post('/send-code', checkMyEmail, sendVerifyCode);
+authRoutes.post('/forgot-pass', sendEmailRecoverPass);
