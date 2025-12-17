@@ -42,7 +42,7 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
         await transporter.sendMail({
             from: 'CodeForge',
             to: req.myEmail,
-            subject: 'Verify Code',
+            subject: 'CodeForge Verify Code',
             text: `Verify Code: ${code}`,
         });
 
