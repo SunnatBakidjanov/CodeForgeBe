@@ -4,6 +4,7 @@ import { transporter } from '../service/transporter';
 import { AuthenticatedRequest } from '../types/request';
 import { prisma } from '../db/prisma';
 import { Logger } from '../utils/Logger';
+import { sendVerifyCodeTemplate } from '../templates/sendVerifyCodeTemplate';
 
 export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) => {
     const { email }: { email: string } = req.body;
@@ -11,7 +12,7 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
     if (!email) return res.status(400).json({ message: 'Email is required' });
 
     const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
     const cooldownMs = 60 * 1000;
 
     try {
@@ -40,10 +41,10 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
         await prisma.verificationCode.create({ data: { email, code, expiresAt } });
 
         await transporter.sendMail({
-            from: 'CodeForge',
+            from: 'CodeForge <no-reply@codesforge.com>',
             to: req.myEmail,
-            subject: 'CodeForge Verify Code',
-            text: `Verify Code: ${code}`,
+            subject: 'Your verification code',
+            html: sendVerifyCodeTemplate({ verifyCode: code }),
         });
 
         Logger.success('Code sent successfully', 'sendVerifyCode');

@@ -1,6 +1,6 @@
 export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) => {
     const codeForgeLink = 'https://sunnatbakidjanov.codes/';
-    const cidEmailImg = 'cid:email-img-codeforge';
+    const cidEmailImg = 'https://i.sunnatbakidjanov.codes/imgs/send-code-codeforge.png';
 
     return `
     <div bgcolor="#e5e7eb" style="margin:0; padding:0; min-width:100%; background-color:#e5e7eb">
@@ -21,7 +21,7 @@ export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) =
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="center" style="padding: 40px 0 0 0; text-align: center;">
-                                                                            <a href=${codeForgeLink} style="font-family: Arial, Verdana, sans-serif; font-size: 36px; color: #ffffff; text-decoration: none; font-weight: bold;">
+                                                                            <a href="${codeForgeLink}" style="font-family: Arial, Verdana, sans-serif; font-size: 36px; color: #ffffff; text-decoration: none; font-weight: bold;">
                                                                                 Code<span style="color:#ff6900;">Forge</span>
                                                                             </a>
                                                                         </td>
@@ -60,7 +60,7 @@ export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) =
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="center" style="padding: 0px 0px 0px 0px; text-align: center;">
-                                                                            <img src=${cidEmailImg} alt="" width="600" height="420" style="display: block; width: 100%; max-width: 600px; height: auto; text-decoration: none;">
+                                                                            <img src="${cidEmailImg}" alt="CodeForge verification" width="600" height="420" style="display: block; width: 100%; max-width: 600px; height: auto; text-decoration: none;">
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>

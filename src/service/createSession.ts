@@ -33,6 +33,13 @@ export const createSession: FnType = async (req, res, userId, refreshExpIn) => {
         },
     });
 
+    res.clearCookie('CFG', {
+        httpOnly: false,
+        secure: false, // ЗАГЛУШКА в продакшене изменить на true для HTTPS
+        sameSite: 'lax',
+        path: '/',
+    });
+
     createRefreshCookie(res, URT, refreshExpIn);
 
     Logger.info('Session created', 'refreshCreateSession');
