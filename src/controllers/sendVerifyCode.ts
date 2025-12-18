@@ -5,13 +5,14 @@ import { AuthenticatedRequest } from '../types/request';
 import { prisma } from '../db/prisma';
 import { Logger } from '../utils/Logger';
 import { sendVerifyCodeTemplate } from '../templates/sendVerifyCodeTemplate';
+import { generateVerifyCode } from '../service/generateVerifyCode';
 
 export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) => {
     const { email }: { email: string } = req.body;
 
     if (!email) return res.status(400).json({ message: 'Email is required' });
 
-    const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
+    const code = generateVerifyCode();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
     const cooldownMs = 60 * 1000;
 
