@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import crypto from 'crypto';
+import { transporter } from '../service/transporter';
 
 export const sendEmailRecoverPass = async (req: Request, res: Response) => {
     const { email }: { email: string } = req.body;
@@ -17,23 +18,9 @@ export const sendEmailRecoverPass = async (req: Request, res: Response) => {
     try {
         const user = await prisma.user.findUnique({ where: { email } });
 
-        if (!user?.isLocalAuth) {
+        if (!user || !user?.isLocalAuth) {
             Logger.warn('User not found', 'sendEmailRecoverPass');
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const passwordReset = await prisma.passwordReset.findFirst({ where: { email } });
-
-        if (passwordReset) {
-            const now = Date.now();
-            const lastSent = passwordReset.lastSentAt.getTime();
-
-            if (now - lastSent < cooldownMs) {
-                const waitSec = Math.ceil((cooldownMs - (now - lastSent)) / 1000);
-                return res.status(429).json({ message: `Please wait ${waitSec} seconds before requesting a new code.`, waitSec });
-            }
-
-            await prisma.passwordReset.deleteMany({ where: { email } });
+            return res.status(200).json({ message: 'Message has been sent' });
         }
 
         const token = crypto.randomUUID();
@@ -47,7 +34,14 @@ export const sendEmailRecoverPass = async (req: Request, res: Response) => {
             },
         });
 
-        return res.status(200).json({ message: 'Email sent successfully' });
+        await transporter.sendMail({
+            from: 'CodeForge <no-reply@sunnatbackidjanov.com>',
+            to: email,
+            subject: 'Recover password',
+            text: `http://localhost:5173/recover-password?token=${token}`,
+        });
+
+        return res.status(200).json({ message: 'Message has been sent' });
     } catch (error) {
         const err = error as Error;
         Logger.error(`Server Error\n ${err.message}`, 'sendEmailRecoverPass');

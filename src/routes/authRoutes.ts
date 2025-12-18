@@ -10,17 +10,17 @@ import { githubLogin } from '../controllers/githubLogin';
 import { githubCallback } from '../controllers/githubCallback';
 import { logout } from '../controllers/logout';
 import { sendVerifyCode } from '../controllers/sendVerifyCode';
-import { checkMyEmail } from '../middleware/checkMyEmail';
 import { sendEmailRecoverPass } from '../controllers/recoverPass';
+import { antiAbuse } from '../middleware/antiAbuse';
 
 export const authRoutes = Router();
 
-authRoutes.post('/register', checkHasRounds, createUser);
+authRoutes.post('/register', checkHasRounds, antiAbuse({ key: 'register', rules: [{ type: 'ip', windowSec: 60, limit: 5 }] }), createUser);
 authRoutes.get('/refresh', checkRefreshExpIn, checkAccessToken, refreshTokens);
 authRoutes.post('/login', checkRefreshExpIn, loginUser);
 authRoutes.post('/google-login', checkRefreshExpIn, googleLogin);
 authRoutes.get('/github-login', githubLogin);
 authRoutes.get('/github-callback', checkRefreshExpIn, githubCallback);
 authRoutes.get('/logout', logout);
-authRoutes.post('/send-code', checkMyEmail, sendVerifyCode);
+authRoutes.post('/send-code', sendVerifyCode);
 authRoutes.post('/forgot-pass', sendEmailRecoverPass);

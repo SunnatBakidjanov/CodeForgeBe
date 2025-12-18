@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
     provider = "mysql"
+    url      = env("DATABASE_URL")
 }
 
 enum AuthProvider {
@@ -28,6 +29,13 @@ model User {
     passwordResets PasswordReset[]
 }
 
+model AbuseRecord {
+	id        String   @id @default(cuid())
+	key       String   @unique
+	count     Int
+	expiresAt DateTime
+}
+
 model Guest {
     id        String   @id @unique
     createdAt DateTime @default(now())
@@ -39,7 +47,6 @@ model PasswordReset {
     email      String   @unique
     token      String
     expiresAt  DateTime
-    lastSentAt DateTime @default(now())
     createdAt  DateTime @default(now())
 
     user User @relation(fields: [email], references: [email], onDelete: Cascade)
@@ -50,7 +57,6 @@ model VerificationCode {
     email      String   @unique
     code       String
     expiresAt  DateTime
-    lastSentAt DateTime @default(now())
     createdAt  DateTime @default(now())
 }
 

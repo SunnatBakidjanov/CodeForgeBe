@@ -1,5 +1,4 @@
 import { Response } from 'express';
-import { randomInt } from 'crypto';
 import { transporter } from '../service/transporter';
 import { AuthenticatedRequest } from '../types/request';
 import { prisma } from '../db/prisma';
@@ -21,30 +20,16 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
 
         if (user?.isLocalAuth) {
             Logger.info(`User with email ${email} already exists`, 'sendVerifyCode');
-            return res.status(409).json({ message: 'User already exists' });
+            return res.status(200).json({ message: 'If email is valid, code has been sent' });
         }
 
-        const lastEntry = await prisma.verificationCode.findFirst({
-            where: { email },
-        });
-
-        if (lastEntry) {
-            const now = Date.now();
-            const lastSent = lastEntry.lastSentAt.getTime();
-
-            if (now - lastSent < cooldownMs) {
-                const waitSec = Math.ceil((cooldownMs - (now - lastSent)) / 1000);
-                return res.status(429).json({ message: `Please wait ${waitSec} seconds before requesting a new code.`, waitSec });
-            }
-        }
-
-        await prisma.verificationCode.deleteMany({ where: { email } });
+        await prisma.verificationCode.delete({ where: { email } });
         await prisma.verificationCode.create({ data: { email, code, expiresAt } });
 
         await transporter.sendMail({
-            from: 'CodeForge <no-reply@codesforge.com>',
-            to: req.myEmail,
-            subject: 'Your verification code',
+            from: 'CodeForge <no-reply@sunnatbackidjanov.com>',
+            to: email,
+            subject: 'Your confirmation code',
             html: sendVerifyCodeTemplate({ verifyCode: code }),
         });
 
