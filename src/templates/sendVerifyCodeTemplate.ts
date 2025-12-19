@@ -164,7 +164,7 @@ export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) =
                                                                 </tr>
 
                                                                 <tr>
-                                                                    <td align="leftt" style="padding: 20px 15px 50px 15px; text-align: center;">
+                                                                    <td align="left" style="padding: 20px 15px 50px 15px; text-align: center;">
                                                                             <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-style: normal; font-size: 16px; color: #ffffff; text-decoration: none; line-height: 23px;">
                                                                                 <b>© Code<span style="color: #ff6900;">Forge</span> — <span style="color: #ff6900;">Crafted</span> Interfaces. <span style="color: #ff6900;">Forged</span> for Developers.</b>
                                                                            </p>

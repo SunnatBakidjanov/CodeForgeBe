@@ -15,12 +15,22 @@ import { antiAbuse } from '../middleware/antiAbuse';
 
 export const authRoutes = Router();
 
-authRoutes.post('/register', checkHasRounds, antiAbuse({ key: 'register', rules: [{ type: 'ip', windowSec: 60, limit: 5 }] }), createUser);
+authRoutes.post('/register', checkHasRounds, antiAbuse({ key: 'register', rules: [{ type: 'ip', windowSec: 120, blockSec: 60, limit: 10 }] }), createUser);
 authRoutes.get('/refresh', checkRefreshExpIn, checkAccessToken, refreshTokens);
 authRoutes.post('/login', checkRefreshExpIn, loginUser);
 authRoutes.post('/google-login', checkRefreshExpIn, googleLogin);
 authRoutes.get('/github-login', githubLogin);
 authRoutes.get('/github-callback', checkRefreshExpIn, githubCallback);
 authRoutes.get('/logout', logout);
-authRoutes.post('/send-code', sendVerifyCode);
+authRoutes.post(
+    '/send-code',
+    antiAbuse({
+        key: 'send-code',
+        rules: [
+            { type: 'email', windowSec: 30, blockSec: 60, limit: 1 },
+            { type: 'ip', windowSec: 30, blockSec: 60, limit: 1 },
+        ],
+    }),
+    sendVerifyCode
+);
 authRoutes.post('/forgot-pass', sendEmailRecoverPass);

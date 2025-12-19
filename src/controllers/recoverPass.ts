@@ -13,7 +13,6 @@ export const sendEmailRecoverPass = async (req: Request, res: Response) => {
     }
 
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-    const cooldownMs = 60 * 1000;
 
     try {
         const user = await prisma.user.findUnique({ where: { email } });
@@ -26,12 +25,10 @@ export const sendEmailRecoverPass = async (req: Request, res: Response) => {
         const token = crypto.randomUUID();
         const hashToken = crypto.createHash('sha256').update(token).digest('hex');
 
-        await prisma.passwordReset.create({
-            data: {
-                email,
-                token: hashToken,
-                expiresAt,
-            },
+        await prisma.passwordReset.upsert({
+            where: { email },
+            create: { email, token: hashToken, expiresAt },
+            update: { token: hashToken, expiresAt },
         });
 
         await transporter.sendMail({

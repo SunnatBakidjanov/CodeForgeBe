@@ -13,7 +13,6 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
 
     const code = generateVerifyCode();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-    const cooldownMs = 60 * 1000;
 
     try {
         const user = await prisma.user.findUnique({ where: { email } });
@@ -23,8 +22,11 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
             return res.status(200).json({ message: 'If email is valid, code has been sent' });
         }
 
-        await prisma.verificationCode.delete({ where: { email } });
-        await prisma.verificationCode.create({ data: { email, code, expiresAt } });
+        await prisma.verificationCode.upsert({
+            where: { email },
+            update: { code, expiresAt },
+            create: { email, code, expiresAt },
+        });
 
         await transporter.sendMail({
             from: 'CodeForge <no-reply@sunnatbackidjanov.com>',

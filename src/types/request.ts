@@ -9,6 +9,13 @@ export type UserType = {
     updatedAt: Date;
 };
 
+type Limit = {
+    type: 'email' | 'ip' | 'user';
+    count: number;
+    ttl: number;
+    limit: number;
+};
+
 export type AccessToken = {
     id: number;
     email: string;
@@ -21,4 +28,5 @@ export interface AuthenticatedRequest extends Request {
         userHashRounds?: number;
     };
     myEmail?: string;
+    limits?: Limit[];
 }

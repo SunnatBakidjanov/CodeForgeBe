@@ -1,6 +1,10 @@
 import { prisma } from '../db/prisma';
 
 export const prismaAbuseStore = {
+    async get(key: string) {
+        return prisma.abuseRecord.findUnique({ where: { key } });
+    },
+
     async incr(key: string, windowSec: number) {
         const now = new Date();
 
@@ -11,8 +15,8 @@ export const prismaAbuseStore = {
 
             await prisma.abuseRecord.upsert({
                 where: { key },
-                update: { count: 1, expiresAt },
-                create: { key, count: 1, expiresAt },
+                update: { count: 1, expiresAt, blockedUntil: null },
+                create: { key, count: 1, expiresAt, blockedUntil: null },
             });
 
             return { count: 1, ttl: windowSec };
@@ -21,8 +25,14 @@ export const prismaAbuseStore = {
         const count = record.count + 1;
         await prisma.abuseRecord.update({ where: { key }, data: { count } });
 
-        const ttl = Math.ceil((record.expiresAt.getTime() - now.getTime()) / 1000);
+        return { count };
+    },
 
-        return { count, ttl };
+    async block(key: string, blockSec: number) {
+        const blockedUntil = new Date(Date.now() + blockSec * 1000);
+
+        await prisma.abuseRecord.update({ where: { key }, data: { blockedUntil, count: 1 } });
+
+        return blockedUntil;
     },
 };
