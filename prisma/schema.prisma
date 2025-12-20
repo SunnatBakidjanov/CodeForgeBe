@@ -46,7 +46,7 @@ model Guest {
 model PasswordReset {
     id         String   @id @unique @default(uuid())
     email      String   @unique
-    token      String
+    token      String   @unique
     expiresAt  DateTime
     createdAt  DateTime @default(now())
 

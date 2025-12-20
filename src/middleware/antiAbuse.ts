@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types/request';
 import { prismaAbuseStore } from '../service/prismaAbuseStore';
 import { Logger } from '../utils/Logger';
+import { readCookie } from '../utils/readCookie';
 
 type Rules = {
     type: 'ip' | 'email' | 'user';
@@ -17,12 +18,16 @@ type Arguments = {
 
 export const antiAbuse = ({ key: action, rules }: Arguments) => {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        const guest = readCookie(req, 'GUEST');
+        const user = readCookie(req, 'REFRESH');
+        const sessionId = user ?? guest ?? 'nonesessionid';
+
         for (const rule of rules) {
             const value = rule.type === 'ip' ? req.ip : rule.type === 'email' ? req.body?.email : rule.type === 'user' ? req.user?.email : null;
 
             if (!value) continue;
 
-            const abuseKey = `abuse:${action}:${rule.type}:${value}`;
+            const abuseKey = `abuse:${action}:${sessionId}:${rule.type}:${req?.ip}:${value}`;
             const record = await prismaAbuseStore.get(abuseKey);
             const now = new Date();
 

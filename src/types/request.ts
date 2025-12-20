@@ -25,8 +25,8 @@ export interface AuthenticatedRequest extends Request {
     user?: UserType & {
         accessToken?: AccessToken;
         refreshExpIn?: string;
-        userHashRounds?: number;
     };
+    hashRounds?: number;
     myEmail?: string;
     limits?: Limit[];
 }

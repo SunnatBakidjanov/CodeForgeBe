@@ -10,14 +10,37 @@ import { githubLogin } from '../controllers/githubLogin';
 import { githubCallback } from '../controllers/githubCallback';
 import { logout } from '../controllers/logout';
 import { sendVerifyCode } from '../controllers/sendVerifyCode';
-import { sendEmailRecoverPass } from '../controllers/recoverPass';
+import { sendEmailRecoverPass } from '../controllers/sendEmailRecoverPass';
 import { antiAbuse } from '../middleware/antiAbuse';
+import { changePassword } from '../controllers/changePassword';
 
 export const authRoutes = Router();
 
-authRoutes.post('/register', checkHasRounds, antiAbuse({ key: 'register', rules: [{ type: 'ip', windowSec: 120, blockSec: 60, limit: 10 }] }), createUser);
+authRoutes.post(
+    '/register',
+    checkHasRounds,
+    antiAbuse({
+        key: 'register',
+        rules: [
+            { type: 'ip', windowSec: 120, blockSec: 60, limit: 30 },
+            { type: 'email', windowSec: 120, blockSec: 60, limit: 10 },
+        ],
+    }),
+    createUser
+);
 authRoutes.get('/refresh', checkRefreshExpIn, checkAccessToken, refreshTokens);
-authRoutes.post('/login', checkRefreshExpIn, loginUser);
+authRoutes.post(
+    '/login',
+    checkRefreshExpIn,
+    antiAbuse({
+        key: 'login',
+        rules: [
+            { type: 'email', windowSec: 120, blockSec: 60, limit: 10 },
+            { type: 'ip', windowSec: 120, blockSec: 60, limit: 30 },
+        ],
+    }),
+    loginUser
+);
 authRoutes.post('/google-login', checkRefreshExpIn, googleLogin);
 authRoutes.get('/github-login', githubLogin);
 authRoutes.get('/github-callback', checkRefreshExpIn, githubCallback);
@@ -27,10 +50,21 @@ authRoutes.post(
     antiAbuse({
         key: 'send-code',
         rules: [
-            { type: 'email', windowSec: 30, blockSec: 60, limit: 1 },
-            { type: 'ip', windowSec: 30, blockSec: 60, limit: 1 },
+            { type: 'email', windowSec: 60, blockSec: 60, limit: 1 },
+            { type: 'ip', windowSec: 600, blockSec: 600, limit: 5 },
         ],
     }),
     sendVerifyCode
 );
-authRoutes.post('/forgot-pass', sendEmailRecoverPass);
+authRoutes.post(
+    '/forgot-pass',
+    antiAbuse({
+        key: 'forgot-pass',
+        rules: [
+            { type: 'email', windowSec: 60, blockSec: 60, limit: 1 },
+            { type: 'ip', windowSec: 600, blockSec: 600, limit: 5 },
+        ],
+    }),
+    sendEmailRecoverPass
+);
+authRoutes.post('/change-pass', antiAbuse({ key: 'change-pass', rules: [{ type: 'ip', windowSec: 60, blockSec: 60, limit: 10 }] }), checkHasRounds, changePassword);

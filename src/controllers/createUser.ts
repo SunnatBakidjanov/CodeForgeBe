@@ -37,7 +37,7 @@ export const createUser = async (req: AuthenticatedRequest, res: Response) => {
 
         await prisma.verificationCode.deleteMany({ where: { email } });
 
-        const HASH_ROUNDS = req.user?.userHashRounds as number;
+        const HASH_ROUNDS = req.hashRounds as number;
         const hashedPassword = await bcrypt.hash(password, HASH_ROUNDS);
 
         if (!user) {

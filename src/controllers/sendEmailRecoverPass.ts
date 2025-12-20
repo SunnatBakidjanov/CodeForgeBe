@@ -3,6 +3,7 @@ import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import crypto from 'crypto';
 import { transporter } from '../service/transporter';
+import { CLIENT_URL, CLIENT_CHANGE_PASS_URL } from '../utils/constants';
 
 export const sendEmailRecoverPass = async (req: Request, res: Response) => {
     const { email }: { email: string } = req.body;
@@ -22,7 +23,7 @@ export const sendEmailRecoverPass = async (req: Request, res: Response) => {
             return res.status(200).json({ message: 'Message has been sent' });
         }
 
-        const token = crypto.randomUUID();
+        const token = crypto.randomBytes(32).toString('hex');
         const hashToken = crypto.createHash('sha256').update(token).digest('hex');
 
         await prisma.passwordReset.upsert({
@@ -31,12 +32,17 @@ export const sendEmailRecoverPass = async (req: Request, res: Response) => {
             update: { token: hashToken, expiresAt },
         });
 
-        await transporter.sendMail({
-            from: 'CodeForge <no-reply@sunnatbackidjanov.com>',
-            to: email,
-            subject: 'Recover password',
-            text: `http://localhost:5173/recover-password?token=${token}`,
-        });
+        try {
+            await transporter.sendMail({
+                from: 'CodeForge <no-reply@sunnatbackidjanov.com>',
+                to: email,
+                subject: 'Recover password',
+                text: `${CLIENT_URL}${CLIENT_CHANGE_PASS_URL}?token=${token}&email=${email}`,
+            });
+        } catch (error) {
+            const err = error as Error;
+            Logger.error(`Server Error\n ${err.message}`, 'sendEmailRecoverPass');
+        }
 
         return res.status(200).json({ message: 'Message has been sent' });
     } catch (error) {
