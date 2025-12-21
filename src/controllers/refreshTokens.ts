@@ -7,7 +7,7 @@ import { createRefreshCookie } from '../service/createRefreshCookie';
 import { readCookie } from '../utils/readCookie';
 
 export const refreshTokens = async (req: AuthenticatedRequest, res: Response) => {
-    const refreshExpIn = req.user?.refreshExpIn as string;
+    const refreshExpIn = req.auth?.refreshExpIn as string;
 
     try {
         const refreshToken = readCookie(req, 'REFRESH');

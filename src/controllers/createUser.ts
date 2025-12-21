@@ -14,14 +14,14 @@ export const createUser = async (req: AuthenticatedRequest, res: Response) => {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (user?.isLocalAuth) {
-        Logger.warn(`User with email ${email} already exists`, 'createUser');
-        return res.status(409).json({ message: 'User already exists' });
-    }
-
     try {
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        if (user?.isLocalAuth) {
+            Logger.warn(`User with email ${email} already exists`, 'createUser');
+            return res.status(409).json({ message: 'User already exists' });
+        }
+
         const verifyEntry = await prisma.verificationCode.findUnique({ where: { email } });
 
         if (!verifyEntry || verifyEntry.code !== code) {

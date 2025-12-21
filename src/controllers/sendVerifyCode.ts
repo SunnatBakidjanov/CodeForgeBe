@@ -19,7 +19,7 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
 
         if (user?.isLocalAuth) {
             Logger.info(`User with email ${email} already exists`, 'sendVerifyCode');
-            return res.status(200).json({ message: 'If email is valid, code has been sent' });
+            return res.status(409).json({ message: 'If email is valid, code has been sent' });
         }
 
         await prisma.verificationCode.upsert({

@@ -11,9 +11,9 @@ export const checkRefreshExpIn = (req: AuthenticatedRequest, res: Response, next
         return res.status(500).json({ message: 'Error logging in' });
     }
 
-    req.user = {
+    req.auth = {
         refreshExpIn: refreshExpIn,
-    } as AuthenticatedRequest['user'];
+    } as AuthenticatedRequest['auth'];
 
     return next();
 };

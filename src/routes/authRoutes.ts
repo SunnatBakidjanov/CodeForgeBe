@@ -13,6 +13,7 @@ import { sendVerifyCode } from '../controllers/sendVerifyCode';
 import { sendEmailRecoverPass } from '../controllers/sendEmailRecoverPass';
 import { antiAbuse } from '../middleware/antiAbuse';
 import { changePassword } from '../controllers/changePassword';
+import { checkChangePassToken } from '../middleware/checkChangePassToken';
 
 export const authRoutes = Router();
 
@@ -50,8 +51,8 @@ authRoutes.post(
     antiAbuse({
         key: 'send-code',
         rules: [
-            { type: 'email', windowSec: 60, blockSec: 60, limit: 1 },
             { type: 'ip', windowSec: 600, blockSec: 600, limit: 5 },
+            { type: 'email', windowSec: 60, blockSec: 60, limit: 0 },
         ],
     }),
     sendVerifyCode
@@ -61,10 +62,11 @@ authRoutes.post(
     antiAbuse({
         key: 'forgot-pass',
         rules: [
-            { type: 'email', windowSec: 60, blockSec: 60, limit: 1 },
             { type: 'ip', windowSec: 600, blockSec: 600, limit: 5 },
+            { type: 'email', windowSec: 60, blockSec: 60, limit: 0 },
         ],
     }),
     sendEmailRecoverPass
 );
-authRoutes.post('/change-pass', antiAbuse({ key: 'change-pass', rules: [{ type: 'ip', windowSec: 60, blockSec: 60, limit: 10 }] }), checkHasRounds, changePassword);
+authRoutes.post('/reset-pass', checkHasRounds, antiAbuse({ key: 'change-pass', rules: [{ type: 'ip', windowSec: 60, blockSec: 60, limit: 10 }] }), checkChangePassToken, changePassword);
+authRoutes.get('/reset-pass/validate', checkChangePassToken, (req, res) => res.sendStatus(200).json({ message: 'Token is valid' }));

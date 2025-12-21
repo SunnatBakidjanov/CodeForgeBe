@@ -22,7 +22,7 @@ type GoogleUser = {
 
 export const googleLogin = async (req: AuthenticatedRequest, res: Response) => {
     const { googleAccessToken }: ReqBody = req.body;
-    const refreshExpIn = req.user?.refreshExpIn as string;
+    const refreshExpIn = req.auth?.refreshExpIn as string;
 
     if (!googleAccessToken) {
         Logger.warn('Google access token is missing', 'googleLogin');

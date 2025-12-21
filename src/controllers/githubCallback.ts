@@ -9,7 +9,7 @@ import { createAccessToken } from '../service/createTokens';
 
 export const githubCallback = async (req: AuthenticatedRequest, res: Response) => {
     const code = req.query.code as string;
-    const refreshExpIn = req.user?.refreshExpIn as string;
+    const refreshExpIn = req.auth?.refreshExpIn as string;
 
     if (!code) {
         Logger.error('No code returned from GitHub', 'githubCallback');

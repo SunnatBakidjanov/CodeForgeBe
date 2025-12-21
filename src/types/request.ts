@@ -1,11 +1,15 @@
 import { Request } from 'express';
 
 export type UserType = {
-    id: string;
     email: string;
-    password?: string;
-    provider: 'local' | 'google' | 'github';
+    id: string;
     createdAt: Date;
+    name: string;
+    googleId: string | null;
+    githubId: string | null;
+    password: string | null;
+    provider: 'local' | 'google' | 'github';
+    isLocalAuth: boolean;
     updatedAt: Date;
 };
 
@@ -22,9 +26,11 @@ export type AccessToken = {
 };
 
 export interface AuthenticatedRequest extends Request {
-    user?: UserType & {
+    user?: UserType;
+    auth?: {
         accessToken?: AccessToken;
         refreshExpIn?: string;
+        changePassToken?: string;
     };
     hashRounds?: number;
     myEmail?: string;

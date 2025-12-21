@@ -2,7 +2,7 @@ import { prisma } from '../db/prisma';
 
 export const prismaAbuseStore = {
     async get(key: string) {
-        return prisma.abuseRecord.findUnique({ where: { key } });
+        return await prisma.abuseRecord.findUnique({ where: { key } });
     },
 
     async incr(key: string, windowSec: number) {

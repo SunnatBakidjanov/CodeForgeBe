@@ -11,7 +11,7 @@ type RequestBody = { [key in 'email' | 'password']: string };
 
 export const loginUser = async (req: AuthenticatedRequest, res: Response) => {
     const { email, password }: RequestBody = req?.body;
-    const refreshExpIn = req.user?.refreshExpIn as string;
+    const refreshExpIn = req.auth?.refreshExpIn as string;
 
     if (!email || !password) {
         Logger.warn('Email or password is missing', 'loginUser');
