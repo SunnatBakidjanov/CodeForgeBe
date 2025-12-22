@@ -20,13 +20,13 @@ export const checkChangePassToken = async (req: AuthenticatedRequest, res: Respo
 
         if (!baseToken) {
             Logger.info('Token not found', 'ChangePassword');
-            return res.status(400).json({ message: 'Token not found' });
+            return res.status(400).json({ message: 'Token not found', type: 'TOKEN_INVALID' });
         }
 
         if (baseToken.expiresAt < new Date()) {
             await prisma.passwordReset.deleteMany({ where: { token: hashToken } });
             Logger.warn('Token expired', 'ChangePassword');
-            return res.status(400).json({ message: 'Token expired' });
+            return res.status(400).json({ message: 'Token expired', type: 'TOKEN_INVALID' });
         }
 
         const user = await prisma.user.findUnique({ where: { email: email } });

@@ -4,6 +4,7 @@ import { prisma } from '../db/prisma';
 import crypto from 'crypto';
 import { transporter } from '../service/transporter';
 import { CLIENT_URL, CLIENT_CHANGE_PASS_URL } from '../utils/constants';
+import { sendRecoverPassTemplate } from '../templates/sendRecoverPassTemplate';
 
 export const sendEmailRecoverPass = async (req: Request, res: Response) => {
     const { email }: { email: string } = req.body;
@@ -37,7 +38,7 @@ export const sendEmailRecoverPass = async (req: Request, res: Response) => {
                 from: 'CodeForge <no-reply@sunnatbackidjanov.com>',
                 to: email,
                 subject: 'Recover password',
-                text: `${CLIENT_URL}${CLIENT_CHANGE_PASS_URL}?token=${token}&email=${email}`,
+                html: sendRecoverPassTemplate({ passwordResetLink: `${CLIENT_URL}${CLIENT_CHANGE_PASS_URL}?token=${token}&email=${email}` }),
             });
         } catch (error) {
             const err = error as Error;
