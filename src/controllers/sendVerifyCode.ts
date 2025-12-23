@@ -7,7 +7,7 @@ import { sendVerifyCodeTemplate } from '../templates/sendVerifyCodeTemplate';
 import { generateVerifyCode } from '../service/generateVerifyCode';
 
 export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) => {
-    const { email }: { email: string } = req.body;
+    const email = req?.user?.email;
 
     if (!email) return res.status(400).json({ message: 'Email is required' });
 
@@ -15,13 +15,6 @@ export const sendVerifyCode = async (req: AuthenticatedRequest, res: Response) =
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
     try {
-        const user = await prisma.user.findUnique({ where: { email } });
-
-        if (user?.isLocalAuth) {
-            Logger.info(`User with email ${email} already exists`, 'sendVerifyCode');
-            return res.status(409).json({ message: 'If email is valid, code has been sent' });
-        }
-
         await prisma.verificationCode.upsert({
             where: { email },
             update: { code, expiresAt },

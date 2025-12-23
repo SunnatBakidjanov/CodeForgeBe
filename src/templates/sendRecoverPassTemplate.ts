@@ -21,14 +21,14 @@ export const sendRecoverPassTemplate = ({ passwordResetLink }: { passwordResetLi
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="left" style="padding: 40px 0 0 0; text-align: center;">
-                                                                            <a href="${codeForgeLink}" style="font-family: Arial, Verdana, sans-serif; text-align: center; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-style: normal; font-size: 36px; color: #ffffff; text-decoration: none; font-weight: bold;">
+                                                                            <a href="${codeForgeLink}" style="font-family: Arial, Verdana, sans-serif; text-align: center; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-style: normal; font-size: 30px; color: #ffffff; text-decoration: none; font-weight: bold;">
                                                                                 Code<span style="color:#ff6900;">Forge</span>
                                                                             </a>
                                                                         </td>
                                                                     </tr>
 
                                                                     <tr>
-                                                                        <td align="center" style="padding: 20px 20px 0px 20px;">
+                                                                        <td align="center" style="padding: 10px 40px 0px 40px;">
                                                                             <table width="100%" cellspacing="0" cellpadding="0" role="presentation">
                                                                                 <tr>
                                                                                     <td height="1" bgcolor="#e5e7eb" style="background-color:#e5e7eb; font-size:0; line-height:0;">

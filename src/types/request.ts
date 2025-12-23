@@ -1,16 +1,16 @@
 import { Request } from 'express';
 
 export type UserType = {
-    email: string;
-    id: string;
-    createdAt: Date;
-    name: string;
-    googleId: string | null;
-    githubId: string | null;
-    password: string | null;
-    provider: 'local' | 'google' | 'github';
-    isLocalAuth: boolean;
-    updatedAt: Date;
+    email?: string;
+    id?: string;
+    createdAt?: Date;
+    name?: string;
+    googleId?: string | null;
+    githubId?: string | null;
+    password?: string | null;
+    provider?: 'local' | 'google' | 'github';
+    isLocalAuth?: boolean;
+    updatedAt?: Date;
 };
 
 type Limit = {

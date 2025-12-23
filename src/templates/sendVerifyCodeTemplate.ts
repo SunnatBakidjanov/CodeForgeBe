@@ -21,17 +21,17 @@ export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) =
                                                                 <tbody>
                                                                     <tr>
                                                                         <td align="left" style="padding: 40px 0 0 0; text-align: center;">
-                                                                            <a href="${codeForgeLink}" style="font-family: Arial, Helvetica, sans-serif; text-align: center; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-style: normal; font-size: 36px; color: #ffffff; text-decoration: none;">
+                                                                            <a href="${codeForgeLink}" style="font-family: Arial, Helvetica, sans-serif; text-align: center; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-style: normal; font-size: 30px; color: #ffffff; text-decoration: none;">
                                                                                 <b>Code<span style="color:#ff6900;">Forge</span></b>
                                                                             </a>
                                                                         </td>
                                                                     </tr>
 
                                                                     <tr>
-                                                                        <td align="center" style="padding: 20px 30px 0px 30px;">
+                                                                        <td align="center" style="padding: 10px 40px 0px 40px;">
                                                                             <table width="100%" cellspacing="0" cellpadding="0" role="presentation">
                                                                                 <tr>
-                                                                                    <td height="2" bgcolor="#ffffff" style="background-color:#ffffff; font-size:0; line-height:0;">
+                                                                                    <td height="1" bgcolor="#ffffff" style="background-color:#ffffff; font-size:0; line-height:0;">
                                                                                         &nbsp;
                                                                                     </td>
                                                                                 </tr>
@@ -100,7 +100,19 @@ export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) =
                                                                     </tr>
 
                                                                     <tr>
-                                                                        <td align="center" style="padding: 40px 0px 0px 0px;">
+                                                                        <td align="center" style="padding: 20px 40px 0px 40px;">
+                                                                            <table width="100%" cellspacing="0" cellpadding="0" role="presentation">
+                                                                                <tr>
+                                                                                    <td height="1" bgcolor="#ffffff" style="background-color:#ffffff; font-size:0; line-height:0;">
+                                                                                        &nbsp;
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td align="center" style="padding: 35px 0px 0px 0px;">
                                                                             <table bgcolor="#000000" align="center" border="0" cellspacing="0" cellpadding="0" style="margin: 0; padding: 12px 80px; background-color: #000000; text-align: center; border-radius: 6px; border: 1px solid #ff6900;">
                                                                                 <tbody>
                                                                                     <tr>
@@ -114,7 +126,19 @@ export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) =
                                                                     </tr>
 
                                                                     <tr>
-                                                                        <td align="center" style="padding: 40px 15px 40px 15px;">
+                                                                        <td align="center" style="padding: 35px 40px 0px 40px;">
+                                                                            <table width="100%" cellspacing="0" cellpadding="0" role="presentation">
+                                                                                <tr>
+                                                                                    <td height="0.5" bgcolor="#ffffff" style="background-color:#ffffff; font-size:0; line-height:0;">
+                                                                                        &nbsp;
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td align="center" style="padding: 35px 15px 40px 15px;">
                                                                             <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-style: normal; font-size: 16px; color: #ffffff; text-decoration: none; line-height: 24px;">
                                                                                 Use it within <span style="color: #ff6900;">15 minutes</span> to prove your identity.
                                                                                 <br>
@@ -152,10 +176,10 @@ export const sendVerifyCodeTemplate = ({ verifyCode }: { verifyCode: string }) =
                                                                 </tr>
 
                                                                 <tr>
-                                                                    <td align="center" style="padding: 35px 30px 0px 30px;">
+                                                                    <td align="center" style="padding: 50px 60px 0px 60px;">
                                                                         <table width="100%" cellspacing="0" cellpadding="0" role="presentation">
                                                                             <tr>
-                                                                                <td height="2" bgcolor="#ffffff" style="background-color:#ffffff; font-size:0; line-height:0;">
+                                                                                <td height="1" bgcolor="#ffffff" style="background-color:#ffffff; font-size:0; line-height:0;">
                                                                                     &nbsp;
                                                                                 </td>
                                                                             </tr>

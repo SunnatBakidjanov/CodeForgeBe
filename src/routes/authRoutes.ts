@@ -14,6 +14,7 @@ import { sendEmailRecoverPass } from '../controllers/sendEmailRecoverPass';
 import { antiAbuse } from '../middleware/antiAbuse';
 import { changePassword } from '../controllers/changePassword';
 import { checkChangePassToken } from '../middleware/checkChangePassToken';
+import { checkUser } from '../middleware/checkUser';
 
 export const authRoutes = Router();
 
@@ -48,12 +49,10 @@ authRoutes.get('/github-callback', checkRefreshExpIn, githubCallback);
 authRoutes.get('/logout', logout);
 authRoutes.post(
     '/send-code',
+    checkUser({ checkPlace: 'send-code', windowSec: 60, waitSec: 60, maxCount: 10 }),
     antiAbuse({
         key: 'send-code',
-        rules: [
-            { type: 'ip', windowSec: 600, blockSec: 600, limit: 5 },
-            { type: 'email', windowSec: 60, blockSec: 60, limit: 0 },
-        ],
+        rules: [{ type: 'email', windowSec: 60, blockSec: 60, limit: 0 }],
     }),
     sendVerifyCode
 );
@@ -61,10 +60,7 @@ authRoutes.post(
     '/forgot-pass',
     antiAbuse({
         key: 'forgot-pass',
-        rules: [
-            { type: 'ip', windowSec: 600, blockSec: 600, limit: 5 },
-            { type: 'email', windowSec: 60, blockSec: 60, limit: 0 },
-        ],
+        rules: [{ type: 'email', windowSec: 60, blockSec: 60, limit: 0 }],
     }),
     sendEmailRecoverPass
 );
