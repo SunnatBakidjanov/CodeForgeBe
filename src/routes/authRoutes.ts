@@ -23,10 +23,7 @@ authRoutes.post(
     checkHasRounds,
     antiAbuse({
         key: 'register',
-        rules: [
-            { type: 'ip', windowSec: 120, blockSec: 60, limit: 30 },
-            { type: 'email', windowSec: 120, blockSec: 60, limit: 10 },
-        ],
+        rules: [{ type: 'ip', windowSec: 900, blockSec: 300, limit: 15, res: { type: 'IP_BLOCKED' } }],
     }),
     createUser
 );
@@ -36,10 +33,7 @@ authRoutes.post(
     checkRefreshExpIn,
     antiAbuse({
         key: 'login',
-        rules: [
-            { type: 'email', windowSec: 120, blockSec: 60, limit: 10 },
-            { type: 'ip', windowSec: 120, blockSec: 60, limit: 30 },
-        ],
+        rules: [{ type: 'ip', windowSec: 300, blockSec: 120, limit: 15, res: { type: 'IP_BLOCKED' } }],
     }),
     loginUser
 );
@@ -49,10 +43,13 @@ authRoutes.get('/github-callback', checkRefreshExpIn, githubCallback);
 authRoutes.get('/logout', logout);
 authRoutes.post(
     '/send-code',
-    checkUser({ checkPlace: 'send-code', windowSec: 60, waitSec: 60, maxCount: 10 }),
+    checkUser({ checkPlace: 'send-code', windowSec: 900, waitSec: 300, maxCount: 15, errorType: 'IP_BLOCKED' }),
     antiAbuse({
         key: 'send-code',
-        rules: [{ type: 'email', windowSec: 60, blockSec: 60, limit: 0 }],
+        rules: [
+            { type: 'ip', windowSec: 900, blockSec: 300, limit: 5, res: { type: 'IP_BLOCKED' } },
+            { type: 'email', windowSec: 10, blockSec: 59, limit: 0 },
+        ],
     }),
     sendVerifyCode
 );
@@ -60,9 +57,12 @@ authRoutes.post(
     '/forgot-pass',
     antiAbuse({
         key: 'forgot-pass',
-        rules: [{ type: 'email', windowSec: 60, blockSec: 60, limit: 0 }],
+        rules: [
+            { type: 'ip', windowSec: 900, blockSec: 300, limit: 5, res: { type: 'IP_BLOCKED' } },
+            { type: 'email', windowSec: 10, blockSec: 59, limit: 0 },
+        ],
     }),
     sendEmailRecoverPass
 );
-authRoutes.post('/reset-pass', checkHasRounds, antiAbuse({ key: 'change-pass', rules: [{ type: 'ip', windowSec: 60, blockSec: 60, limit: 10 }] }), checkChangePassToken, changePassword);
+authRoutes.post('/reset-pass', checkHasRounds, antiAbuse({ key: 'change-pass', rules: [{ type: 'ip', windowSec: 900, blockSec: 300, limit: 5 }] }), checkChangePassToken, changePassword);
 authRoutes.get('/reset-pass/validate', checkChangePassToken, (req, res) => res.sendStatus(200).json({ message: 'Token is valid' }));

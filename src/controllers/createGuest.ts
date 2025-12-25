@@ -10,12 +10,14 @@ export const createGuest = async (req: Request, res: Response) => {
     if (user) {
         Logger.warn('User already logged in', 'createGuest');
 
-        res.clearCookie('CFG', {
-            httpOnly: false,
-            secure: false, // ЗАГЛУШКА в продакшене изменить на true для HTTPS
-            sameSite: 'lax',
-            path: '/',
-        });
+        if (guest) {
+            res.clearCookie('CFG', {
+                httpOnly: false,
+                secure: false, // ЗАГЛУШКА в продакшене изменить на true для HTTPS
+                sameSite: 'lax',
+                path: '/',
+            });
+        }
 
         return res.status(403).json({ message: 'User already logged in' });
     }

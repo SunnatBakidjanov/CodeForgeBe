@@ -19,7 +19,7 @@ export const prismaAbuseStore = {
                 create: { key, count: 1, expiresAt, blockedUntil: null },
             });
 
-            return { count: 1, ttl: windowSec };
+            return { count: 1 };
         }
 
         const count = record.count + 1;

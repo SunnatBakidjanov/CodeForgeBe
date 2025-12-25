@@ -18,7 +18,7 @@ export const sendMessageMail = async (req: AuthenticatedRequest, res: Response) 
 
     try {
         await transporter.sendMail({
-            from: 'CodeForge',
+            from: 'CodeForge <no-reply@sunnatbackidjanov.com>',
             to: req.myEmail,
             subject: 'New message from contact form',
             html: sendMessageTemplate({ name, email, message }),

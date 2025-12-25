@@ -10,9 +10,10 @@ type Arguments = {
     checkPlace: string;
     waitSec: number;
     maxCount: number;
+    errorType?: string;
 };
 
-export const checkUser = ({ checkPlace, windowSec, waitSec, maxCount }: Arguments) => {
+export const checkUser = ({ checkPlace, windowSec, waitSec, maxCount, errorType }: Arguments) => {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         const { email }: { email: string } = req.body;
         const guest = readCookie(req, 'GUEST');
@@ -25,22 +26,6 @@ export const checkUser = ({ checkPlace, windowSec, waitSec, maxCount }: Argument
         }
 
         try {
-            const abuseKey = `abuse:${checkPlace}:${sessionId}:email:${req?.ip}:ip`;
-            const record = await prismaAbuseStore.get(abuseKey);
-            const now = new Date();
-
-            if (record?.blockedUntil && record.blockedUntil > new Date()) {
-                const waitSec = Math.max(0, Math.floor((record.blockedUntil.getTime() - now.getTime()) / 1000));
-
-                return res.status(429).json({ message: 'Too many requests', waitSec });
-            }
-
-            const { count } = await prismaAbuseStore.incr(abuseKey, windowSec);
-
-            if (count > maxCount) {
-                await prismaAbuseStore.block(abuseKey, waitSec);
-            }
-
             const user = await prisma.user.findUnique({ where: { email } });
 
             if (user && user?.isLocalAuth) {
@@ -51,6 +36,24 @@ export const checkUser = ({ checkPlace, windowSec, waitSec, maxCount }: Argument
             req.user = {
                 email,
             };
+
+            if (!user) next();
+
+            const abuseKey = `abuse:${checkPlace}:${sessionId}:email:${req?.ip}:ip`;
+            const record = await prismaAbuseStore.get(abuseKey);
+            const now = new Date();
+
+            if (record?.blockedUntil && record.blockedUntil > new Date()) {
+                const waitSec = Math.max(0, Math.floor((record.blockedUntil.getTime() - now.getTime()) / 1000));
+
+                return res.status(429).json({ message: 'Too many requests', waitSec, type: errorType });
+            }
+
+            const { count } = await prismaAbuseStore.incr(abuseKey, windowSec);
+
+            if (count > maxCount) {
+                await prismaAbuseStore.block(abuseKey, waitSec);
+            }
 
             next();
         } catch (error) {

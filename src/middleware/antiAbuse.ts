@@ -8,6 +8,7 @@ type Rules = {
     windowSec: number;
     blockSec: number;
     limit: number;
+    res?: { [key: string]: string };
 };
 
 type Arguments = {
@@ -33,7 +34,7 @@ export const antiAbuse = ({ key: action, rules }: Arguments) => {
             if (record?.blockedUntil && record.blockedUntil > now) {
                 const waitSec = Math.max(0, Math.floor((record.blockedUntil.getTime() - now.getTime()) / 1000));
 
-                return res.status(429).json({ message: 'Too many requests', waitSec });
+                return res.status(429).json({ message: 'Too many requests', waitSec, ...rule.res });
             }
 
             const { count } = await prismaAbuseStore.incr(abuseKey, rule.windowSec);
