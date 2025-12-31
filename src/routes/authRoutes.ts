@@ -65,4 +65,4 @@ authRoutes.post(
     sendEmailRecoverPass
 );
 authRoutes.post('/reset-pass', checkHasRounds, antiAbuse({ key: 'change-pass', rules: [{ type: 'ip', windowSec: 900, blockSec: 300, limit: 5 }] }), checkChangePassToken, changePassword);
-authRoutes.get('/reset-pass/validate', checkChangePassToken, (req, res) => res.sendStatus(200).json({ message: 'Token is valid' }));
+authRoutes.get('/reset-pass/validate', checkChangePassToken, (req, res) => res.status(200).json({ message: 'Token is valid' }));

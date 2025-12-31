@@ -2,12 +2,13 @@ import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import { readCookie } from '../utils/readCookie';
+import { hashRefreshToken } from '../service/createTokens';
 
 export const createGuest = async (req: Request, res: Response) => {
     const guest = readCookie(req, 'GUEST');
-    const user = readCookie(req, 'REFRESH');
+    const refreshToken = readCookie(req, 'REFRESH');
 
-    if (user) {
+    if (refreshToken) {
         Logger.warn('User already logged in', 'createGuest');
 
         if (guest) {

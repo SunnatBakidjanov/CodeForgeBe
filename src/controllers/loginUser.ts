@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import { createAccessToken } from '../service/createTokens';
 import { createSession } from '../service/createSession';
 import { AuthenticatedRequest } from '../types/request';
+import { createAccessCookie } from '../service/createAccessCookie';
 
 type RequestBody = { [key in 'email' | 'password']: string };
 
@@ -40,7 +41,8 @@ export const loginUser = async (req: AuthenticatedRequest, res: Response) => {
         Logger.success(`${email} logged in successfully`, 'loginUser');
 
         const accessToken = createAccessToken({ id: user.id, email: user.email, name: user.name });
-        return res.status(200).json({ message: 'User logged in successfully', token: accessToken });
+        createAccessCookie(res, accessToken);
+        return res.status(200).json({ message: 'User logged in successfully' });
     } catch (error) {
         Logger.error(`Server Error\n ${(error as Error).message}`, 'loginUser');
         return res.status(500).json({ message: 'Error logging in' });

@@ -1,12 +1,13 @@
 import { AuthenticatedRequest } from '../types/request';
 import { Logger } from './Logger';
 
-type CookieNames = 'REFRESH' | 'GUEST';
+type CookieNames = 'REFRESH' | 'ACCESS' | 'GUEST';
 
 export const readCookie = (req: AuthenticatedRequest, cookieName: CookieNames) => {
     const cookieAbbreviation = {
         REFRESH: 'URT',
         GUEST: 'CFG',
+        ACCESS: 'UAT',
     };
 
     const key = cookieAbbreviation[cookieName];

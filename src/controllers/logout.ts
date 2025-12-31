@@ -4,6 +4,7 @@ import { clearRefreshCookie } from '../service/createRefreshCookie';
 import { prisma } from '../db/prisma';
 import { hashRefreshToken } from '../service/createTokens';
 import { Logger } from '../utils/Logger';
+import { clearAccessCookie } from '../service/createAccessCookie';
 
 export const logout = async (req: Request, res: Response) => {
     try {
@@ -18,6 +19,7 @@ export const logout = async (req: Request, res: Response) => {
         await prisma.sessions.delete({ where: { refreshHash: refreshHash } });
 
         clearRefreshCookie(res);
+        clearAccessCookie(res);
 
         Logger.success('User logged out successfully', 'logout');
         return res.status(200).json({ message: 'User logged out successfully' });

@@ -16,9 +16,9 @@ type Arguments = {
 export const checkUser = ({ checkPlace, windowSec, waitSec, maxCount, errorType }: Arguments) => {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         const { email }: { email: string } = req.body;
-        const guest = readCookie(req, 'GUEST');
-        const user = readCookie(req, 'REFRESH');
-        const sessionId = user ?? guest ?? 'nonesessionid';
+        const guestCookie = readCookie(req, 'GUEST') as string;
+        const userCookie = readCookie(req, 'REFRESH') as string;
+        const sessionId = userCookie ?? guestCookie ?? 'nonesessionid';
 
         if (!email) {
             Logger.warn('Missing required fields', 'checkUser');
@@ -28,16 +28,11 @@ export const checkUser = ({ checkPlace, windowSec, waitSec, maxCount, errorType 
         try {
             const user = await prisma.user.findUnique({ where: { email } });
 
-            if (user && user?.isLocalAuth) {
-                Logger.info(`User with email ${email} already exists`, 'sendVerifyCode');
-                return res.status(409).json({ message: 'If email is valid, code has been sent' });
+            if (!user?.isLocalAuth) {
+                req.user = { email };
+                next();
+                return;
             }
-
-            req.user = {
-                email,
-            };
-
-            if (!user) next();
 
             const abuseKey = `abuse:${checkPlace}:${sessionId}:email:${req?.ip}:ip`;
             const record = await prismaAbuseStore.get(abuseKey);
@@ -53,6 +48,11 @@ export const checkUser = ({ checkPlace, windowSec, waitSec, maxCount, errorType 
 
             if (count > maxCount) {
                 await prismaAbuseStore.block(abuseKey, waitSec);
+            }
+
+            if (user && user?.isLocalAuth) {
+                Logger.info(`User with email ${email} already exists`, 'sendVerifyCode');
+                return res.status(409).json({ message: 'If email is valid, code has been sent' });
             }
 
             next();
