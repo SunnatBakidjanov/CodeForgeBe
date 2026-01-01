@@ -15,6 +15,8 @@ import { antiAbuse } from '../middleware/antiAbuse';
 import { changePassword } from '../controllers/changePassword';
 import { checkChangePassToken } from '../middleware/checkChangePassToken';
 import { checkUser } from '../middleware/checkUser';
+import { getMe } from '../controllers/getMe';
+import { checkGuest } from '../middleware/checkGuest';
 
 export const authRoutes = Router();
 
@@ -27,7 +29,8 @@ authRoutes.post(
     }),
     createUser
 );
-authRoutes.get('/refresh', checkRefreshExpIn, checkAccessToken, refreshTokens);
+authRoutes.get('/refresh', checkRefreshExpIn, refreshTokens);
+authRoutes.get('/me', checkGuest, checkAccessToken, getMe);
 authRoutes.post(
     '/login',
     checkRefreshExpIn,

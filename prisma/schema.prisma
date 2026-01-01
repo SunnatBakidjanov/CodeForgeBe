@@ -14,12 +14,19 @@ enum AuthProvider {
     github
 }
 
+enum UserRole {
+    creator
+    admin
+    user
+}
+
 model User {
     id             String          @id @unique @default(uuid())
     name           String          @db.VarChar(20)
     email          String          @unique @db.VarChar(254)
     password       String?         @db.VarChar(64)
     provider       AuthProvider    @default(local)
+    role           UserRole        @default(user)
     googleId       String?         @unique
     githubId       String?         @unique
     isLocalAuth    Boolean         @default(false)
@@ -30,35 +37,29 @@ model User {
 }
 
 model AbuseRecord {
-	id        String   @id @default(cuid())
-	key       String   @unique
-	count     Int
+    id           String    @id @default(cuid())
+    key          String    @unique
+    count        Int
     blockedUntil DateTime?
-	expiresAt DateTime
-}
-
-model Guest {
-    id        String   @id @unique
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    expiresAt    DateTime
 }
 
 model PasswordReset {
-    id         String   @id @unique @default(uuid())
-    email      String   @unique
-    token      String   @unique
-    expiresAt  DateTime
-    createdAt  DateTime @default(now())
+    id        String   @id @unique @default(uuid())
+    email     String   @unique
+    token     String   @unique
+    expiresAt DateTime
+    createdAt DateTime @default(now())
 
     user User @relation(fields: [email], references: [email], onDelete: Cascade)
 }
 
 model VerificationCode {
-    id         String   @id @unique @default(uuid())
-    email      String   @unique
-    code       String
-    expiresAt  DateTime
-    createdAt  DateTime @default(now())
+    id        String   @id @unique @default(uuid())
+    email     String   @unique
+    code      String
+    expiresAt DateTime
+    createdAt DateTime @default(now())
 }
 
 model Sessions {

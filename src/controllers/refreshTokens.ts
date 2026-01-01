@@ -5,7 +5,7 @@ import { createAccessToken, createRefreshToken, hashRefreshToken } from '../serv
 import type { AuthenticatedRequest } from '../types/request';
 import { createRefreshCookie } from '../service/createRefreshCookie';
 import { readCookie } from '../utils/readCookie';
-import { createAccessCookie } from '../service/createAccessCookie';
+import { clearAccessCookie, createAccessCookie } from '../service/createAccessCookie';
 
 export const refreshTokens = async (req: AuthenticatedRequest, res: Response) => {
     const refreshExpIn = req.auth?.refreshExpIn as string;
@@ -15,6 +15,7 @@ export const refreshTokens = async (req: AuthenticatedRequest, res: Response) =>
 
         if (!refreshToken) {
             Logger.info('No refresh token', 'refreshTokens');
+            clearAccessCookie(res);
             return res.status(403).json({ message: 'No refresh token' });
         }
 
@@ -51,6 +52,7 @@ export const refreshTokens = async (req: AuthenticatedRequest, res: Response) =>
         createRefreshCookie(res, newRefreshToken, refreshExpIn);
         createAccessCookie(res, newAccessToken);
 
+        Logger.info('Tokens refreshed successfully', 'refreshTokens');
         return res.json({ message: 'Success' });
     } catch (err) {
         Logger.error(`Server Error\n ${(err as Error).message}`, 'refreshTokens');

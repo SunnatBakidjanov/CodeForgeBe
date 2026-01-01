@@ -1,31 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
-import { Logger } from '../utils/Logger';
-import { prisma } from '../db/prisma';
 import { readCookie } from '../utils/readCookie';
 
-export const checkGuest = async (req: Request, res: Response, next: NextFunction) => {
-    const guest = readCookie(req, 'GUEST');
-    const { user } = req.body;
+export const checkGuest = (req: Request, res: Response, next: NextFunction) => {
+    const guestCookie = readCookie(req, 'GUEST');
+    const refreshCookie = readCookie(req, 'REFRESH');
 
-    if (user) return next();
-
-    if (!guest) {
-        Logger.warn('Guest not found', 'checkGuest');
-        return res.status(403).json({ message: 'Guest not found' });
+    if (refreshCookie && guestCookie) {
+        res.clearCookie('CFG', { path: '/' });
     }
 
-    try {
-        const foundGuest = await prisma.guest.findUnique({ where: { id: guest } });
-
-        if (!foundGuest) {
-            Logger.warn('Guest not found in DB', 'checkGuest');
-            return res.status(403).json({ message: 'Guest not found in database' });
-        }
-
-        Logger.info(`Guest found: ${guest}`, 'checkGuest');
-        next();
-    } catch (error) {
-        Logger.error(`Server Error\n ${(error as Error).message}`, 'checkGuest');
-        return res.status(500).json({ message: 'Server error' });
+    if (!guestCookie && !refreshCookie) {
+        res.cookie('CFG', Date.now().toString(), {
+            httpOnly: false,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+        });
     }
+
+    next();
 };

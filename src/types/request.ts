@@ -21,7 +21,8 @@ type Limit = {
 };
 
 export type AccessToken = {
-    id: number;
+    id: string;
+    name: string;
     email: string;
 };
 
