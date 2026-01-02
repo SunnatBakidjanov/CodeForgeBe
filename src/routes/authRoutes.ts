@@ -30,7 +30,7 @@ authRoutes.post(
     createUser
 );
 authRoutes.get('/refresh', checkRefreshExpIn, refreshTokens);
-authRoutes.get('/me', checkGuest, checkAccessToken, getMe);
+authRoutes.get('/me', getMe);
 authRoutes.post(
     '/login',
     checkRefreshExpIn,

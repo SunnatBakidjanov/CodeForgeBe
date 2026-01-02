@@ -4,28 +4,70 @@ import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import { clearAccessCookie } from '../service/createAccessCookie';
 import { clearRefreshCookie } from '../service/createRefreshCookie';
+import { readCookie } from '../utils/readCookie';
+import { verifyAccessToken } from '../service/createTokens';
+import jwt from 'jsonwebtoken';
 
 export const getMe = async (req: AuthenticatedRequest, res: Response) => {
-    const access = req.auth?.accessToken as AccessToken;
+    const refreshToken = readCookie(req, 'REFRESH');
+    const guestCookie = readCookie(req, 'GUEST');
+    const accessToken = readCookie(req, 'ACCESS');
 
-    if (!access?.email) {
-        Logger.warn('Missing required fields', 'getMe');
-        return res.status(400).json({ message: 'Missing required fields' });
-    }
+    if (refreshToken) {
+        let decodedAccess;
 
-    try {
-        const user = await prisma.user.findUnique({ where: { email: access.email }, select: { id: true, email: true, name: true, updatedAt: true, isLocalAuth: true } });
-
-        if (!user) {
-            clearAccessCookie(res);
-            clearRefreshCookie(res);
-            return res.status(401).json({ message: 'USER_NOT_FOUND', type: 'user' });
+        if (!accessToken) {
+            Logger.warn('Access token not found', 'checkAccessToken');
+            return res.status(401).json({ message: 'INVALID_ACCESS_TOKEN' });
         }
 
-        Logger.info('User found', 'getMe');
-        return res.status(200).json({ message: 'Sueccess', userData: { id: user.id, email: user.email, name: user.name, uptadetAt: user.updatedAt } });
-    } catch (error) {
-        Logger.error(`Server Error\n ${(error as Error).message}`, 'getMe');
-        return res.status(500).json({ message: 'Server error', type: 'user' });
+        try {
+            const decodedToken = verifyAccessToken(accessToken);
+            decodedAccess = decodedToken as AccessToken;
+
+            Logger.info('Access token verified', 'checkAccessToken');
+        } catch (err) {
+            if (err instanceof jwt.TokenExpiredError) {
+                Logger.info('Access token expired', 'checkAccessToken');
+                return res.status(401).json({ message: 'INVALID_ACCESS_TOKEN' });
+            }
+
+            Logger.warn('Access token invalid', 'checkAccessToken');
+            return res.status(403).json({ message: 'Access token invalid' });
+        }
+
+        try {
+            const user = await prisma.user.findUnique({ where: { email: decodedAccess.email }, select: { id: true, email: true, name: true, updatedAt: true, isLocalAuth: true } });
+
+            if (!user) {
+                clearAccessCookie(res);
+                clearRefreshCookie(res);
+                return res.status(401).json({ message: 'USER_NOT_FOUND', type: 'user' });
+            }
+
+            Logger.info('User found', 'getMe');
+            return res.status(200).json({ message: 'Sueccess', userData: { id: user.id, email: user.email, name: user.name, uptadetAt: user.updatedAt }, type: 'user' });
+        } catch (error) {
+            Logger.error(`Server Error\n ${(error as Error).message}`, 'getMe');
+            return res.status(500).json({ message: 'Server error', type: 'user' });
+        }
     }
+
+    if (!guestCookie) {
+        const guestId = Date.now().toString();
+        const cookieMaxAge = 1000 * 60 * 60 * 24 * 7; // 7 days
+
+        res.cookie('CFG', guestId, {
+            httpOnly: false,
+            secure: false, // ЗАГЛУШКА в продакшене изменить на true для HTTPS
+            sameSite: 'lax',
+            maxAge: cookieMaxAge,
+        });
+
+        Logger.success(`Guest ${guestId} created`, 'createGuest');
+        return res.status(201).json({ message: 'Guest created successfully', type: 'guest' });
+    }
+
+    Logger.success('Guest found', 'getMe');
+    return res.status(200).json({ message: 'Guest found', type: 'guest' });
 };

@@ -6,7 +6,6 @@ import { Logger } from './utils/Logger';
 import { dbConnect } from './db/dbConnect';
 import { authRoutes } from './routes/authRoutes';
 import { sendEmailRoutes } from './routes/sendiEmail';
-import { guestRoutes } from './routes/guestRoutes';
 
 const app = express();
 const PORT = process.env.APP_PORT;
@@ -30,7 +29,6 @@ app.use(cookieParser());
 
 app.use('/api', authRoutes);
 app.use('/api', sendEmailRoutes);
-app.use('/api', guestRoutes);
 
 app.get('/', (req, res) => {
     res.send('Server is running');
