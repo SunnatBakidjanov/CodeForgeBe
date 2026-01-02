@@ -39,4 +39,5 @@ export const silentLogout = async (req: Request, res: Response) => {
     await prisma.sessions.deleteMany({ where: { refreshHash } });
 
     clearRefreshCookie(res);
+    clearAccessCookie(res);
 };

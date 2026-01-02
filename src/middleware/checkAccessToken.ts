@@ -5,7 +5,7 @@ import type { AuthenticatedRequest, AccessToken } from '../types/request';
 import jwt from 'jsonwebtoken';
 import { readCookie } from '../utils/readCookie';
 
-export const checkAccessToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const checkAccessToken = (req: AuthenticatedRequest, res: Response, next?: NextFunction) => {
     const accessToken = readCookie(req, 'ACCESS');
 
     if (!accessToken) {
@@ -22,7 +22,7 @@ export const checkAccessToken = (req: AuthenticatedRequest, res: Response, next:
 
         Logger.info('Access token verified', 'checkAccessToken');
 
-        next();
+        if (next) next();
     } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
             Logger.info('Access token expired', 'checkAccessToken');

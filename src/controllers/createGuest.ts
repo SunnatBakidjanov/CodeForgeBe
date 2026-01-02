@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { Logger } from '../utils/Logger';
-import { prisma } from '../db/prisma';
 import { readCookie } from '../utils/readCookie';
+import { prisma } from '../db/prisma';
 import { hashRefreshToken } from '../service/createTokens';
+import { checkAccessToken } from '../middleware/checkAccessToken';
 
 export const createGuest = async (req: Request, res: Response) => {
     const guest = readCookie(req, 'GUEST');
@@ -20,7 +21,9 @@ export const createGuest = async (req: Request, res: Response) => {
             });
         }
 
-        return res.status(403).json({ message: 'User already logged in' });
+        checkAccessToken(req, res, undefined);
+
+        return res.status(200).json({ message: 'User already logged in', type: 'user' });
     }
 
     if (!guest) {
@@ -34,17 +37,10 @@ export const createGuest = async (req: Request, res: Response) => {
             maxAge: cookieMaxAge,
         });
 
-        try {
-            await prisma.guest.create({ data: { id: guestId } });
-        } catch (error) {
-            Logger.error(`Error creating guest: ${(error as Error).message}`, 'createGuest');
-            return res.status(500).json({ message: 'Error creating guest' });
-        }
-
         Logger.success(`Guest ${guestId} created`, 'createGuest');
-        return res.status(201).json({ message: 'Guest created successfully', guestId: guestId });
+        return res.status(201).json({ message: 'Guest created successfully', type: 'guest' });
     }
 
     Logger.info('Guest already exists', 'createGuest');
-    return res.status(200).json({ message: 'Guest already exists' });
+    return res.status(200).json({ message: 'Guest already exists', type: 'guest' });
 };
