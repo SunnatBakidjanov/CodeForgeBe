@@ -53,7 +53,7 @@ export const refreshTokens = async (req: AuthenticatedRequest, res: Response) =>
         createAccessCookie(res, newAccessToken);
 
         Logger.info('Tokens refreshed successfully', 'refreshTokens');
-        return res.json({ message: 'Success' });
+        return res.status(200).json({ message: 'Success' });
     } catch (err) {
         Logger.error(`Server Error\n ${(err as Error).message}`, 'refreshTokens');
         return res.status(500).json({ message: 'Server error' });

@@ -4,10 +4,12 @@ import { createRefreshCookie } from './createRefreshCookie';
 import { prisma } from '../db/prisma';
 import { Logger } from '../utils/Logger';
 import { readCookie } from '../utils/readCookie';
+import { createAccessCookie } from './createAccessCookie';
+import { createAccessToken } from './createTokens';
 
-type FnType = (req: Request, res: Response, userId: string, refreshExpIn: string) => Promise<void>;
+type FnType = (req: Request, res: Response, user: { id: string; email: string; name: string }, refreshExpIn: string) => Promise<void>;
 
-export const createSession: FnType = async (req, res, userId, refreshExpIn) => {
+export const createSession: FnType = async (req, res, user, refreshExpIn) => {
     const refreshCookie = readCookie(req, 'REFRESH');
 
     if (refreshCookie) {
@@ -25,7 +27,7 @@ export const createSession: FnType = async (req, res, userId, refreshExpIn) => {
 
     await prisma.sessions.create({
         data: {
-            user: { connect: { id: userId } },
+            user: { connect: { id: user?.id } },
             refreshHash,
             expiresAt: new Date(Date.now() + Number(refreshExpIn)),
             ip: req.ip,
@@ -39,6 +41,9 @@ export const createSession: FnType = async (req, res, userId, refreshExpIn) => {
         sameSite: 'lax',
         path: '/',
     });
+
+    const accessToken = createAccessToken({ id: user.id, email: user.email, name: user.name });
+    createAccessCookie(res, accessToken);
 
     createRefreshCookie(res, URT, refreshExpIn);
 

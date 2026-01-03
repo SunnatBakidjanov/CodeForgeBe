@@ -80,12 +80,10 @@ export const githubCallback = async (req: AuthenticatedRequest, res: Response) =
             });
         }
 
-        await createSession(req, res, user.id, refreshExpIn);
+        await createSession(req, res, user, refreshExpIn);
 
         Logger.success('Logged in with GitHub', 'githubCallback');
-
-        const accessToken = createAccessToken({ id: user.id, email: user.email, name: user.name });
-        return sendGithubHtml(res, 'success', 200, undefined, accessToken);
+        return sendGithubHtml(res, 'success', 200, undefined);
     } catch (error) {
         Logger.error(`Server error:\n ${(error as Error).message}`, 'githubCallback');
         res.status(500).json({ message: 'GitHub auth error' });

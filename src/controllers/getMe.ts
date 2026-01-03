@@ -17,7 +17,7 @@ export const getMe = async (req: AuthenticatedRequest, res: Response) => {
         let decodedAccess;
 
         if (!accessToken) {
-            Logger.warn('Access token not found', 'checkAccessToken');
+            Logger.warn('Access token not found', 'getMe');
             return res.status(401).json({ message: 'INVALID_ACCESS_TOKEN' });
         }
 
@@ -25,15 +25,17 @@ export const getMe = async (req: AuthenticatedRequest, res: Response) => {
             const decodedToken = verifyAccessToken(accessToken);
             decodedAccess = decodedToken as AccessToken;
 
-            Logger.info('Access token verified', 'checkAccessToken');
+            Logger.info('Access token verified', 'getMe');
         } catch (err) {
             if (err instanceof jwt.TokenExpiredError) {
-                Logger.info('Access token expired', 'checkAccessToken');
+                Logger.info('Access token expired', 'getMe');
                 return res.status(401).json({ message: 'INVALID_ACCESS_TOKEN' });
             }
 
-            Logger.warn('Access token invalid', 'checkAccessToken');
-            return res.status(403).json({ message: 'Access token invalid' });
+            clearAccessCookie(res);
+            clearRefreshCookie(res);
+            Logger.warn('Access token invalid', 'getMe');
+            return res.status(403).json({ message: 'INVALID_ACCESS_TOKEN' });
         }
 
         try {
@@ -52,6 +54,8 @@ export const getMe = async (req: AuthenticatedRequest, res: Response) => {
             return res.status(500).json({ message: 'Server error', type: 'user' });
         }
     }
+
+    clearAccessCookie(res);
 
     if (!guestCookie) {
         const guestId = Date.now().toString();

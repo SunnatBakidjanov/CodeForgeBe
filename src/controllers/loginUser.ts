@@ -36,12 +36,9 @@ export const loginUser = async (req: AuthenticatedRequest, res: Response) => {
 
         await prisma.user.update({ where: { email }, data: { provider: 'local' } });
 
-        await createSession(req, res, user.id, refreshExpIn);
+        await createSession(req, res, user, refreshExpIn);
 
         Logger.success(`${email} logged in successfully`, 'loginUser');
-
-        const accessToken = createAccessToken({ id: user.id, email: user.email, name: user.name });
-        createAccessCookie(res, accessToken);
         return res.status(200).json({ message: 'User logged in successfully' });
     } catch (error) {
         Logger.error(`Server Error\n ${(error as Error).message}`, 'loginUser');
