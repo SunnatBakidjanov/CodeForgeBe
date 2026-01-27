@@ -3,10 +3,8 @@ import { Response } from 'express';
 import { Logger } from '../utils/Logger';
 import { prisma } from '../db/prisma';
 import bcrypt from 'bcrypt';
-import { createAccessToken } from '../service/createTokens';
 import { createSession } from '../service/createSession';
 import { AuthenticatedRequest } from '../types/request';
-import { createAccessCookie } from '../service/createAccessCookie';
 
 type RequestBody = { [key in 'email' | 'password']: string };
 
